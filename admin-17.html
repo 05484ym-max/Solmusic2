@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ניהול | Sol Music</title>
+
+<meta name="theme-color" content="#12100E">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ניהול - Sol Music">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --black: #0E0C0A;
+    --card: #1C1812;
+    --gold: #C6A152;
+    --gold-light: #E6C682;
+    --text: #F3E9D2;
+    --text-dim: #9C9184;
+    --danger: #C25B4A;
+    --success: #6FA37A;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{
+    background: var(--black);
+    color: var(--text);
+    font-family: 'Assistant', sans-serif;
+    min-height:100vh;
+    padding-bottom: 40px;
+  }
+
+  /* ---------- Login gate ---------- */
+  #loginGate{
+    min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column;
+    padding: 20px;
+  }
+  #loginGate h1{
+    font-family:'Playfair Display', serif;
+    color: var(--gold-light);
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+  #loginGate input{
+    width: 100%;
+    max-width: 280px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(198,161,82,0.4);
+    background: var(--card);
+    color: var(--text);
+    font-size: 15px;
+    text-align:center;
+    margin-bottom: 14px;
+  }
+  #loginGate button{
+    background: var(--gold);
+    color: var(--black);
+    border:none;
+    padding: 12px 34px;
+    border-radius: 20px;
+    font-weight:700;
+    font-size: 14px;
+  }
+  #loginError{ color: var(--danger); font-size:13px; margin-top:10px; display:none; }
+
+  /* ---------- App ---------- */
+  #app{ display:none; }
+  header{
+    text-align:center;
+    padding: 24px 16px 16px;
+    border-bottom: 1px solid rgba(198,161,82,0.25);
+  }
+  header h1{
+    font-family:'Playfair Display', serif;
+    color: var(--gold-light);
+    font-size: 20px;
+  }
+
+  .tabs{
+    display:flex;
+    border-bottom: 1px solid rgba(198,161,82,0.2);
+  }
+  .tab{
+    flex:1;
+    text-align:center;
+    padding: 13px 6px;
+    font-size: 13px;
+    font-weight:600;
+    color: var(--text-dim);
+    cursor:pointer;
+    border-bottom: 2px solid transparent;
+  }
+  .tab.active{
+    color: var(--gold-light);
+    border-color: var(--gold);
+  }
+
+  .tab-panel{ display:none; padding: 16px; }
+  .tab-panel.active{ display:block; }
+
+  .row-card{
+    background: var(--card);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(198,161,82,0.15);
+    display:flex;
+    gap: 12px;
+  }
+  .row-card img{
+    width: 100px;
+    height: 60px;
+    object-fit:cover;
+    border-radius: 8px;
+    flex-shrink:0;
+  }
+  .row-info{ flex:1; min-width:0; }
+  .row-title{ font-size: 13.5px; font-weight:600; line-height:1.3; }
+  .row-sub{ font-size: 11.5px; color: var(--text-dim); margin-top:4px; }
+  .row-actions{ display:flex; gap:8px; margin-top:8px; }
+  .btn-sm{
+    border:none;
+    border-radius: 14px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .btn-approve{ background: var(--success); color:#0E0C0A; }
+  .btn-reject{ background: var(--danger); color:#fff; }
+  .btn-remove{ background: transparent; border:1px solid var(--danger); color: var(--danger); }
+
+  .form-block{
+    background: var(--card);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(198,161,82,0.15);
+  }
+  .form-block h3{ font-size:14px; color: var(--gold-light); margin-bottom:12px; }
+  .form-block input, .form-block select{
+    width:100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(198,161,82,0.3);
+    background: #0E0C0A;
+    color: var(--text);
+    font-size: 13.5px;
+    margin-bottom: 10px;
+  }
+  .form-block button{
+    width:100%;
+    background: var(--gold);
+    color: var(--black);
+    border:none;
+    padding: 11px;
+    border-radius: 10px;
+    font-weight:700;
+    font-size: 13.5px;
+  }
+  .new-playlist-row-admin{
+    display:flex;
+    gap:8px;
+  }
+  .new-playlist-row-admin input{
+    flex:1;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(198,161,82,0.3);
+    background: #0E0C0A;
+    color: var(--text);
+    font-size: 13.5px;
+  }
+  .new-playlist-row-admin button{
+    background: var(--gold);
+    color: var(--black);
+    border:none;
+    padding: 0 16px;
+    border-radius: 8px;
+    font-weight:700;
+    font-size: 12.5px;
+  }
+  .blocked-word-chip{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background: rgba(194,91,74,0.12);
+    border: 1px solid rgba(194,91,74,0.4);
+    border-radius: 14px;
+    padding: 5px 10px;
+    font-size: 11.5px;
+    color: var(--text);
+  }
+  .blocked-word-chip button{
+    background:none;
+    border:none;
+    color: var(--danger);
+    font-size: 13px;
+    padding:0;
+    cursor:pointer;
+  }
+  .checkbox-row{
+    display:flex;
+    align-items:flex-start;
+    gap:8px;
+    margin-bottom: 14px;
+    font-size: 12.5px;
+    color: var(--text-dim);
+    cursor:pointer;
+  }
+  .checkbox-row input{
+    width:auto;
+    margin: 2px 0 0 0;
+    accent-color: var(--gold);
+  }
+  .trusted-badge{
+    display:inline-block;
+    background: rgba(111,163,122,0.15);
+    color: var(--success);
+    border: 1px solid var(--success);
+    border-radius: 10px;
+    padding: 2px 9px;
+    font-size: 10.5px;
+    font-weight:700;
+    margin-right: 6px;
+  }
+  .btn-trust{
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+  }
+
+  .cat-group{
+    background: var(--card);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(198,161,82,0.15);
+  }
+  .cat-group-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .cat-group-name{
+    font-size: 14px;
+    font-weight:700;
+    color: var(--gold-light);
+  }
+  .cat-subs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    margin-top: 10px;
+  }
+  .cat-sub-chip{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background: rgba(198,161,82,0.1);
+    border: 1px solid rgba(198,161,82,0.25);
+    border-radius: 14px;
+    padding: 5px 10px;
+    font-size: 11.5px;
+    color: var(--text);
+  }
+  .cat-sub-chip button{
+    background:none;
+    border:none;
+    color: var(--danger);
+    font-size: 13px;
+    padding:0;
+    cursor:pointer;
+  }
+  .btn-remove-sm{
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    border-radius: 12px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight:700;
+  }
+
+  .lib-cat-card{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background: var(--card);
+    border: 1px solid rgba(198,161,82,0.15);
+    border-radius: 12px;
+    padding: 15px 16px;
+    margin-bottom: 10px;
+    cursor:pointer;
+  }
+  .lib-cat-card .name{
+    font-size: 14px;
+    font-weight:700;
+    color: var(--gold-light);
+  }
+  .lib-cat-card .arrow{
+    color: var(--text-dim);
+    font-size: 16px;
+  }
+
+  .fetch-btn{
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+    padding: 12px;
+    border-radius: 10px;
+    font-weight:600;
+    font-size: 13.5px;
+    margin-bottom: 16px;
+  }
+
+  .empty{ text-align:center; color: var(--text-dim); font-size:13.5px; padding: 30px 10px; }
+  .toast{
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+    background: var(--gold); color:var(--black);
+    padding: 10px 20px; border-radius: 20px;
+    font-size: 13px; font-weight:700;
+    display:none; z-index:999;
+  }
+</style>
+</head>
+<body>
+
+<div id="loginGate">
+  <h1>ניהול Sol Music</h1>
+  <input type="password" id="pwInput" placeholder="סיסמה">
+  <button onclick="login()">כניסה</button>
+  <div id="loginError">סיסמה שגויה</div>
+</div>
+
+<div id="app">
+  <header><h1>ניהול Sol Music</h1></header>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="pending">ממתינים</div>
+    <div class="tab" data-tab="channels">ערוצים</div>
+    <div class="tab" data-tab="categories">קטגוריות</div>
+    <div class="tab" data-tab="library">ספרייה</div>
+  </div>
+
+  <div class="tab-panel active" id="tab-pending">
+    <button class="fetch-btn" onclick="fetchNow()">🔄 בדוק עכשיו סרטונים חדשים מהערוצים</button>
+    <button id="approveAllPendingBtn" class="fetch-btn" style="border-color: var(--success); color: var(--success);" onclick="approveAllPending()">✓ אשר את כולם</button>
+    <div class="form-block" style="padding:12px;">
+      <input type="text" id="pendingFilter" placeholder="חיפוש לפי שם שיר או שם ערוץ..." oninput="filterPending()" style="margin-bottom:8px;">
+      <button id="approveAllBtn" class="fetch-btn" style="display:none; border-color: var(--success); color: var(--success); margin-bottom:0;" onclick="approveAllFiltered()">✓ אשר את כל התוצאות המסוננות</button>
+    </div>
+    <div id="pendingList"><div class="empty">טוען...</div></div>
+  </div>
+
+  <div class="tab-panel" id="tab-channels">
+    <div class="form-block">
+      <h3>הוספת ערוץ למעקב אוטומטי</h3>
+      <input type="text" id="newChannelId" placeholder="Channel ID (מתחיל ב-UC...)">
+      <input type="text" id="newChannelName" placeholder="שם הערוץ (לתצוגה)">
+      <select id="newChannelCategory"></select>
+      <label class="checkbox-row">
+        <input type="checkbox" id="newChannelAutoApprove">
+        <span>אשר אוטומטית את כל תוכן הערוץ הזה (בלי לעבור אישור ידני)</span>
+      </label>
+      <button onclick="addChannel()">הוסף ערוץ</button>
+    </div>
+    <div id="channelsList"><div class="empty">טוען...</div></div>
+  </div>
+
+  <div class="tab-panel" id="tab-categories">
+    <div class="form-block">
+      <h3>הוספת קטגוריה ראשית</h3>
+      <input type="text" id="newParentCatName" placeholder="שם הקטגוריה (למשל: מוזיקה)">
+      <button onclick="addParentCategory()">הוסף קטגוריה ראשית</button>
+    </div>
+    <div class="form-block">
+      <h3>הוספת תת-קטגוריה</h3>
+      <p style="font-size:11px; color:var(--text-dim); margin-bottom:8px;">אפשר לבחור כל קטגוריה קיימת כהורה - כולל תת-קטגוריה עצמה, כדי לבנות עומק בלתי מוגבל (למשל: מוזיקה ← מוטי וייס ← אלבומים)</p>
+      <select id="subCatParentSelect"></select>
+      <input type="text" id="newSubCatName" placeholder="שם תת-הקטגוריה (למשל: אלבומים)">
+      <button onclick="addSubCategory()">הוסף תת-קטגוריה</button>
+    </div>
+    <div id="categoriesTreeList"><div class="empty">טוען...</div></div>
+
+    <div class="form-block" style="margin-top:20px;">
+      <h3>🛡️ סינון אוטומטי - מילים חסומות</h3>
+      <p style="font-size:11.5px; color:var(--text-dim); margin-bottom:10px; line-height:1.5;">
+        סרטון שבכותרת שלו מופיעה אחת מהמילים האלה, יישאר תמיד ב"ממתינים" לבדיקה שלך -
+        גם אם הוא מגיע מערוץ שסימנת כ"מהימן". תוכן בלי אף מילה חסומה מערוץ מהימן יעלה אוטומטית כרגיל.
+      </p>
+      <div class="new-playlist-row-admin">
+        <input type="text" id="newBlockedWord" placeholder="הוספת מילה לחסימה...">
+        <button onclick="addBlockedWord()">הוסף</button>
+      </div>
+      <div id="blockedWordsList" class="cat-subs" style="margin-top:12px;"></div>
+    </div>
+
+    <div class="form-block" style="margin-top:12px;">
+      <h3>✓ רשימה לבנה - אישור מהיר לבקשות משתמשים</h3>
+      <p style="font-size:11.5px; color:var(--text-dim); margin-bottom:10px; line-height:1.5;">
+        כשמשתמש שולח קישור דרך "בקשת תוכן" באתר, ואם הכותרת של הסרטון מכילה אחת מהמילים האלה
+        (למשל שם אמן שאתה כבר סומך עליו) - הסרטון עולה <b style="color:var(--gold-light);">מיד</b>,
+        בלי לחכות לאישור שלך. שאר הבקשות ימשיכו כרגיל ל"ממתינים".
+      </p>
+      <div class="new-playlist-row-admin">
+        <input type="text" id="newAllowedWord" placeholder="הוספת מילת מפתח מאושרת...">
+        <button onclick="addAllowedWord()">הוסף</button>
+      </div>
+      <div id="allowedWordsList" class="cat-subs" style="margin-top:12px;"></div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-library">
+    <div id="libraryBreadcrumb" style="display:none; align-items:center; gap:8px; margin-bottom:12px;">
+      <button class="btn-sm btn-trust" id="libraryBackBtn" onclick="libraryGoBack()">→ חזרה</button>
+      <button class="btn-sm btn-trust" id="libraryForwardBtn" onclick="libraryGoForward()">קדימה ←</button>
+      <span id="libraryBreadcrumbText" style="font-size:12.5px; color:var(--text-dim);"></span>
+    </div>
+    <div id="libraryList"><div class="empty">טוען...</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ========================================================
+  // הגדרה - יש להחליף בכתובת ה-Apps Script שלך אחרי הפריסה
+  // ========================================================
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxgSug1MuMAuOyi0XgAdd5zfEztjXibDoZZ3y24BjghYRiEmGOgdPNW7_YRqKdNvfTD/exec';
+
+  let PASSWORD = sessionStorage.getItem('solmusic_pw') || '';
+
+  if(PASSWORD){ init(); }
+
+  function login(){
+    const pw = document.getElementById('pwInput').value;
+    PASSWORD = pw;
+    sessionStorage.setItem('solmusic_pw', pw);
+    init(true);
+  }
+
+  async function init(isLoginAttempt){
+    // בדיקת סיסמה מול שרת דרך בקשת pending
+    try{
+      const res = await fetch(`${APPS_SCRIPT_URL}?action=pending&password=${encodeURIComponent(PASSWORD)}`);
+      const data = await res.json();
+      if(data.error){
+        if(isLoginAttempt){
+          document.getElementById('loginError').style.display = 'block';
+        }
+        sessionStorage.removeItem('solmusic_pw');
+        return;
+      }
+      document.getElementById('loginGate').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      renderPending(data);
+      loadCategoriesIntoSelect();
+      loadChannels();
+    }catch(err){
+      showToast('שגיאת חיבור, נסי שוב');
+    }
+  }
+
+  // ---------- Tabs ----------
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.onclick = () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+      if(tab.dataset.tab === 'library') loadLibrary();
+      if(tab.dataset.tab === 'categories') { loadCategoriesTree(); loadBlockedWords(); loadAllowedWords(); }
+    };
+  });
+
+  function showToast(msg, duration){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', duration || 2200);
+  }
+
+  // ---------- Pending ----------
+  let allPendingVideos = [];
+  let currentPendingFilter = '';
+
+  function renderPending(list){
+    allPendingVideos = list;
+    applyPendingFilter();
+  }
+
+  function applyPendingFilter(){
+    const q = currentPendingFilter.trim().toLowerCase();
+    const filtered = q
+      ? allPendingVideos.filter(v =>
+          (v.Title && v.Title.toLowerCase().indexOf(q) !== -1) ||
+          (v.ChannelName && v.ChannelName.toLowerCase().indexOf(q) !== -1))
+      : allPendingVideos;
+
+    const approveAllBtn = document.getElementById('approveAllBtn');
+    approveAllBtn.style.display = (q && filtered.length) ? 'block' : 'none';
+    approveAllBtn.textContent = `✓ אשר את כל ${filtered.length} התוצאות המסוננות`;
+
+    renderPendingList(filtered);
+  }
+
+  function filterPending(){
+    currentPendingFilter = document.getElementById('pendingFilter').value;
+    applyPendingFilter();
+  }
+
+  async function approveAllPending(){
+    if (!allPendingVideos.length){ showToast('אין כרגע כלום לאשר'); return; }
+    if (!confirm(`לאשר את כל ${allPendingVideos.length} הסרטונים הממתינים?`)) return;
+
+    showToast(`מאשר ${allPendingVideos.length} סרטונים...`);
+    let errorCount = 0;
+    let firstError = '';
+    for (const v of allPendingVideos) {
+      const res = await postAction({ action:'approve', videoId:v.VideoID });
+      if (res.error){ errorCount++; firstError = res.error; }
+    }
+    if (errorCount > 0){
+      showToast(`שגיאה ב-${errorCount} מתוך ${allPendingVideos.length}: ${firstError}`, 6000);
+    } else {
+      showToast('כולם אושרו ✓');
+    }
+    reloadPending();
+  }
+
+  async function approveAllFiltered(){
+    const q = currentPendingFilter.trim().toLowerCase();
+    const filtered = allPendingVideos.filter(v =>
+      (v.Title && v.Title.toLowerCase().indexOf(q) !== -1) ||
+      (v.ChannelName && v.ChannelName.toLowerCase().indexOf(q) !== -1));
+
+    showToast(`מאשר ${filtered.length} סרטונים...`);
+    let errorCount = 0;
+    let firstError = '';
+    for (const v of filtered) {
+      const res = await postAction({ action:'approve', videoId:v.VideoID });
+      if (res.error){ errorCount++; firstError = res.error; }
+    }
+    if (errorCount > 0){
+      showToast(`שגיאה ב-${errorCount} מתוך ${filtered.length}: ${firstError}`, 6000);
+    } else {
+      showToast('כל התוצאות אושרו ✓');
+    }
+    document.getElementById('pendingFilter').value = '';
+    currentPendingFilter = '';
+    reloadPending();
+  }
+
+  function renderPendingList(list){
+    const el = document.getElementById('pendingList');
+    if(!list.length){ el.innerHTML = '<div class="empty">אין סרטונים ממתינים כרגע</div>'; return; }
+    el.innerHTML = '';
+    list.forEach(v => {
+      const isUserRequest = v.Source === 'user';
+      const div = document.createElement('div');
+      div.className = 'row-card';
+      div.innerHTML = `
+        <img src="${v.Thumbnail}">
+        <div class="row-info">
+          <div class="row-title">${isUserRequest ? '<span class="trusted-badge" style="background:rgba(198,161,82,0.15); color:var(--gold-light); border-color:var(--gold-light);">בקשת משתמש</span>' : ''}${escapeHtml(v.Title)}</div>
+          <div class="row-sub">${escapeHtml(v.ChannelName)} · ${escapeHtml(v.Category)}</div>
+          <div class="row-actions">
+            <button class="btn-sm btn-approve" onclick="approveVideo('${v.VideoID}')">אשר</button>
+            <button class="btn-sm btn-reject" onclick="rejectVideo('${v.VideoID}')">דחה</button>
+          </div>
+        </div>
+      `;
+      el.appendChild(div);
+    });
+  }
+
+  async function reloadPending(){
+    const res = await fetch(`${APPS_SCRIPT_URL}?action=pending&password=${encodeURIComponent(PASSWORD)}`);
+    renderPending(await res.json());
+  }
+
+  async function approveVideo(id){
+    const res = await postAction({ action:'approve', videoId:id });
+    if (res.error){ showToast('שגיאה: ' + res.error, 6000); return; }
+    showToast('אושר ✓');
+    reloadPending();
+  }
+  async function rejectVideo(id){
+    const res = await postAction({ action:'reject', videoId:id });
+    if (res.error){ showToast('שגיאה: ' + res.error, 6000); return; }
+    showToast('נדחה');
+    reloadPending();
+  }
+
+  async function fetchNow(){
+    showToast('בודק סרטונים חדשים...');
+    const res = await postAction({ action:'fetchNow' });
+    showToast(`נמצאו ${res.added || 0} סרטונים חדשים`);
+    reloadPending();
+  }
+
+  // ---------- Channels ----------
+  async function loadCategoriesIntoSelect(){
+    const res = await fetch(`${APPS_SCRIPT_URL}?action=categories`);
+    const cats = await res.json();
+    const sel = document.getElementById('newChannelCategory');
+    sel.innerHTML = cats.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+  }
+
+  // ---------- Categories (tree management) ----------
+  async function loadCategoriesTree(){
+    const el = document.getElementById('categoriesTreeList');
+    let tree;
+    try{
+      const res = await fetch(`${APPS_SCRIPT_URL}?action=categoryTree`);
+      tree = await res.json();
+    }catch(err){
+      el.innerHTML = '<div class="empty" style="color:var(--danger);">שגיאת רשת בטעינת קטגוריות</div>';
+      return;
+    }
+
+    if (tree && tree.error){
+      el.innerHTML = `<div class="empty" style="color:var(--danger);">שגיאת שרת: ${escapeHtml(tree.error)}</div>`;
+      return;
+    }
+    if (!Array.isArray(tree)){
+      el.innerHTML = '<div class="empty" style="color:var(--danger);">מבנה נתונים לא צפוי מהשרת - ודא שה-Deploy עדכני (Manage deployments → New version)</div>';
+      return;
+    }
+
+    // ממלאים את הבורר של "לאיזו קטגוריה להוסיף תת-קטגוריה" - הפעם עם *כל* הקטגוריות
+    // הקיימות (כולל תתי-קטגוריות עצמן), עם הזחה ויזואלית שמראה את העומק שלהן
+    const parentSel = document.getElementById('subCatParentSelect');
+    parentSel.innerHTML = flattenTreeAsOptions(tree).join('');
+
+    if(!tree.length){ el.innerHTML = '<div class="empty">אין עדיין קטגוריות</div>'; return; }
+    el.innerHTML = '';
+    tree.forEach(node => el.appendChild(renderCategoryNode(node, 0)));
+  }
+
+  // הופך את העץ לרשימת <option> שטוחה עם קידומת "—" לפי העומק, לבחירת הורה
+  function flattenTreeAsOptions(nodes, depth){
+    depth = depth || 0;
+    let options = [];
+    nodes.forEach(node => {
+      const prefix = depth > 0 ? '— '.repeat(depth) : '';
+      options.push(`<option value="${escapeHtml(node.name)}">${prefix}${escapeHtml(node.name)}</option>`);
+      options = options.concat(flattenTreeAsOptions(node.children, depth + 1));
+    });
+    return options;
+  }
+
+  // בונה רקורסיבית כרטיס לקטגוריה + כל הצאצאים שלה, בעומק בלתי מוגבל
+  function renderCategoryNode(node, depth){
+    const group = document.createElement('div');
+    group.className = 'cat-group';
+    group.style.marginRight = (depth * 16) + 'px';
+
+    const head = document.createElement('div');
+    head.className = 'cat-group-head';
+    head.innerHTML = `
+      <div class="cat-group-name">${escapeHtml(node.name)}</div>
+      <div class="row-actions" style="margin-top:0;">
+        <button class="btn-remove-sm" style="border-color:var(--gold); color:var(--gold-light);" onclick="editCategory('${escapeHtml(node.name)}')">ערוך</button>
+        <button class="btn-remove-sm" onclick="removeCategory('${escapeHtml(node.name)}')">הסר</button>
+      </div>
+    `;
+    group.appendChild(head);
+
+    if (!node.children.length){
+      const empty = document.createElement('div');
+      empty.style.cssText = 'font-size:11.5px; color:var(--text-dim); margin-top:8px;';
+      empty.textContent = 'אין תתי-קטגוריות עדיין';
+      group.appendChild(empty);
+    } else {
+      const childrenWrap = document.createElement('div');
+      childrenWrap.style.marginTop = '10px';
+      node.children.forEach(child => childrenWrap.appendChild(renderCategoryNode(child, depth + 1)));
+      group.appendChild(childrenWrap);
+    }
+
+    return group;
+  }
+
+  function editCategory(oldName){
+    const newName = prompt('שם חדש עבור "' + oldName + '":', oldName);
+    if (!newName || newName.trim() === '' || newName === oldName) return;
+    postAction({ action:'renameCategory', oldName:oldName, newName:newName.trim() })
+      .then(() => { showToast('השם עודכן'); loadCategoriesTree(); });
+  }
+
+  async function addParentCategory(){
+    const name = document.getElementById('newParentCatName').value.trim();
+    if(!name){ showToast('נא להזין שם קטגוריה'); return; }
+    await postAction({ action:'addCategory', name:name });
+    showToast('הקטגוריה נוספה');
+    document.getElementById('newParentCatName').value = '';
+    loadCategoriesTree();
+  }
+
+  async function addSubCategory(){
+    const parent = document.getElementById('subCatParentSelect').value;
+    const name = document.getElementById('newSubCatName').value.trim();
+    if(!name){ showToast('נא להזין שם תת-קטגוריה'); return; }
+    await postAction({ action:'addCategory', name:name, parentCategory:parent });
+    showToast('תת-הקטגוריה נוספה');
+    document.getElementById('newSubCatName').value = '';
+    loadCategoriesTree();
+  }
+
+  async function removeCategory(name){
+    await postAction({ action:'removeCategory', name:name });
+    showToast('הוסר');
+    loadCategoriesTree();
+  }
+
+  // ---------- Blocked words (safety filter) ----------
+  async function loadBlockedWords(){
+    const res = await fetch(`${APPS_SCRIPT_URL}?action=blockedWords&password=${encodeURIComponent(PASSWORD)}`);
+    const words = await res.json();
+    const el = document.getElementById('blockedWordsList');
+    if (words.error){ el.innerHTML = `<span style="font-size:11.5px; color:var(--danger);">שגיאה: ${escapeHtml(words.error)} - ודא שהרצת את migrateAddBlockedWordsSheet</span>`; return; }
+    if(!words.length){ el.innerHTML = '<span style="font-size:11.5px; color:var(--text-dim);">אין עדיין מילים חסומות</span>'; return; }
+    el.innerHTML = '';
+    words.forEach(w => {
+      const chip = document.createElement('div');
+      chip.className = 'blocked-word-chip';
+      chip.innerHTML = `<span>${escapeHtml(w)}</span><button onclick="removeBlockedWord('${escapeHtml(w)}')">✕</button>`;
+      el.appendChild(chip);
+    });
+  }
+
+  async function addBlockedWord(){
+    const input = document.getElementById('newBlockedWord');
+    const word = input.value.trim();
+    if(!word){ showToast('נא להזין מילה'); return; }
+    const res = await postAction({ action:'addBlockedWord', word:word });
+    if (res.error){ showToast('שגיאה: ' + res.error, 6000); return; }
+    showToast('המילה נוספה לסינון');
+    input.value = '';
+    loadBlockedWords();
+  }
+
+  async function removeBlockedWord(word){
+    await postAction({ action:'removeBlockedWord', word:word });
+    showToast('הוסר מהסינון');
+    loadBlockedWords();
+  }
+
+  // ---------- Allowed words (whitelist for fast-tracking user requests) ----------
+  async function loadAllowedWords(){
+    const res = await fetch(`${APPS_SCRIPT_URL}?action=allowedWords&password=${encodeURIComponent(PASSWORD)}`);
+    const words = await res.json();
+    const el = document.getElementById('allowedWordsList');
+    if (words.error){ el.innerHTML = `<span style="font-size:11.5px; color:var(--danger);">שגיאה: ${escapeHtml(words.error)} - ודא שהרצת את migrateAddAllowedWordsSheet</span>`; return; }
+    if(!words.length){ el.innerHTML = '<span style="font-size:11.5px; color:var(--text-dim);">אין עדיין מילים ברשימה הלבנה</span>'; return; }
+    el.innerHTML = '';
+    words.forEach(w => {
+      const chip = document.createElement('div');
+      chip.className = 'cat-sub-chip';
+      chip.innerHTML = `<span>${escapeHtml(w)}</span><button onclick="removeAllowedWord('${escapeHtml(w)}')">✕</button>`;
+      el.appendChild(chip);
+    });
+  }
+
+  async function addAllowedWord(){
+    const input = document.getElementById('newAllowedWord');
+    const word = input.value.trim();
+    if(!word){ showToast('נא להזין מילה'); return; }
+    const res = await postAction({ action:'addAllowedWord', word:word });
+    if (res.error){ showToast('שגיאה: ' + res.error, 6000); return; }
+    showToast('נוסף לרשימה הלבנה');
+    input.value = '';
+    loadAllowedWords();
+  }
+
+  async function removeAllowedWord(word){
+    await postAction({ action:'removeAllowedWord', word:word });
+    showToast('הוסר');
+    loadAllowedWords();
+  }
+
+  async function loadChannels(){
+    const res = await fetch(`${APPS_SCRIPT_URL}?action=channels&password=${encodeURIComponent(PASSWORD)}`);
+    const channels = await res.json();
+    const el = document.getElementById('channelsList');
+    if(!channels.length){ el.innerHTML = '<div class="empty">עדיין לא נוספו ערוצים</div>'; return; }
+    el.innerHTML = '';
+    channels.forEach(c => {
+      const isTrusted = c.AutoApprove === true || c.AutoApprove === 'TRUE';
+      const div = document.createElement('div');
+      div.className = 'row-card';
+      div.innerHTML = `
+        <div class="row-info">
+          <div class="row-title">${isTrusted ? '<span class="trusted-badge">מהימן ✓</span>' : ''}${escapeHtml(c.ChannelName)}</div>
+          <div class="row-sub">${escapeHtml(c.Category)} · ${escapeHtml(c.ChannelID)}</div>
+          <div class="row-actions">
+            ${isTrusted ? '' : `<button class="btn-sm btn-trust" onclick="trustChannel('${c.ChannelID}')">אשר את כל תוכן הערוץ</button>`}
+            <button class="btn-sm btn-trust" onclick="editChannel('${c.ChannelID}', '${escapeHtml(c.ChannelName)}')">ערוך</button>
+            <button class="btn-sm btn-remove" onclick="removeChannel('${c.ChannelID}')">הסר ערוץ</button>
+          </div>
+        </div>
+      `;
+      el.appendChild(div);
+    });
+  }
+
+  async function editChannel(id, currentName){
+    const newName = prompt('שם חדש לערוץ:', currentName);
+    if (newName === null) return;
+    const newCategory = prompt('קטגוריה חדשה (השאירי ריק כדי לא לשנות):', '') || '';
+    await postAction({ action:'editChannel', channelId:id, channelName:newName.trim() || null, category:newCategory.trim() || null });
+    showToast('הערוץ עודכן');
+    loadChannels();
+  }
+
+  async function trustChannel(id){
+    await postAction({ action:'trustChannel', channelId:id });
+    showToast('הערוץ מאושר - כל התוכן שלו יעלה אוטומטית מעכשיו');
+    loadChannels();
+    reloadPending();
+  }
+
+  async function addChannel(){
+    const id = document.getElementById('newChannelId').value.trim();
+    const name = document.getElementById('newChannelName').value.trim();
+    const category = document.getElementById('newChannelCategory').value;
+    const autoApprove = document.getElementById('newChannelAutoApprove').checked;
+    if(!id || !name){ showToast('נא למלא את כל השדות'); return; }
+    await postAction({ action:'addChannel', channelId:id, channelName:name, category:category, autoApprove:autoApprove });
+    showToast('הערוץ נוסף');
+    document.getElementById('newChannelId').value = '';
+    document.getElementById('newChannelName').value = '';
+    document.getElementById('newChannelAutoApprove').checked = false;
+    loadChannels();
+  }
+
+  async function removeChannel(id){
+    await postAction({ action:'removeChannel', channelId:id });
+    showToast('הערוץ הוסר');
+    loadChannels();
+  }
+
+  // ---------- Library (drill-down with back/forward history, like browser navigation) ----------
+  let currentLibraryCategory = null;
+  let currentLibraryLabel = '';
+  let libraryHistory = [];   // כל מסך שביקרנו בו, לפי סדר
+  let libraryHistoryIdx = -1; // המיקום הנוכחי בתוך ההיסטוריה
+
+  // ניווט "קדימה" למסך חדש - חותך כל היסטוריית "קדימה" ישנה (בדיוק כמו בדפדפן)
+  function libraryNavigate(state){
+    libraryHistory = libraryHistory.slice(0, libraryHistoryIdx + 1);
+    libraryHistory.push(state);
+    libraryHistoryIdx++;
+    libraryRenderState(state);
+  }
+
+  function libraryGoBack(){
+    if (libraryHistoryIdx <= 0) return;
+    libraryHistoryIdx--;
+    libraryRenderState(libraryHistory[libraryHistoryIdx]);
+  }
+
+  function libraryGoForward(){
+    if (libraryHistoryIdx >= libraryHistory.length - 1) return;
+    libraryHistoryIdx++;
+    libraryRenderState(libraryHistory[libraryHistoryIdx]);
+  }
+
+  function updateLibraryNavButtons(label){
+    const bc = document.getElementById('libraryBreadcrumb');
+    const backBtn = document.getElementById('libraryBackBtn');
+    const fwdBtn = document.getElementById('libraryForwardBtn');
+
+    bc.style.display = libraryHistoryIdx > 0 || libraryHistoryIdx < libraryHistory.length - 1 ? 'flex' : 'none';
+    backBtn.style.opacity = libraryHistoryIdx > 0 ? '1' : '0.35';
+    backBtn.disabled = libraryHistoryIdx <= 0;
+    fwdBtn.style.opacity = libraryHistoryIdx < libraryHistory.length - 1 ? '1' : '0.35';
+    fwdBtn.disabled = libraryHistoryIdx >= libraryHistory.length - 1;
+    document.getElementById('libraryBreadcrumbText').textContent = label || '';
+  }
+
+  // מפנה לפונקציית התצוגה המתאימה, בלי לגעת בהיסטוריה (משמש לרינדור מחדש בזמן back/forward)
+  function libraryRenderState(state){
+    if (state.view === 'categories') renderLibraryCategories(state);
+    else if (state.view === 'node') renderLibraryNode(state);
+    else if (state.view === 'videos') renderLibraryVideos(state);
+  }
+
+  async function loadLibrary(){
+    libraryHistory = [];
+    libraryHistoryIdx = -1;
+    libraryNavigate({ view:'categories', label:'' });
+  }
+
+  async function renderLibraryCategories(state){
+    updateLibraryNavButtons(state.label);
+    const el = document.getElementById('libraryList');
+    el.innerHTML = '<div class="empty">טוען...</div>';
+    const res = await fetch(`${APPS_SCRIPT_URL}?action=categoryTree`);
+    const tree = await res.json();
+
+    el.innerHTML = '';
+
+    const allCard = document.createElement('div');
+    allCard.className = 'lib-cat-card';
+    allCard.innerHTML = `<span class="name">כל הסרטונים</span><span class="arrow">←</span>`;
+    allCard.onclick = () => libraryNavigate({ view:'videos', category:null, label:'כל הסרטונים' });
+    el.appendChild(allCard);
+
+    if (!tree.length){
+      el.innerHTML += '<div class="empty">אין עדיין קטגוריות</div>';
+      return;
+    }
+
+    tree.forEach(node => el.appendChild(buildLibraryCard(node, [])));
+  }
+
+  // כרטיס אחד לצומת בעץ - עובד באותה צורה לכל עומק (קטגוריה ראשית, תת, תת-תת וכו')
+  function buildLibraryCard(node, pathLabels){
+    const card = document.createElement('div');
+    card.className = 'lib-cat-card';
+    card.innerHTML = `<span class="name">${escapeHtml(node.name)}</span><span class="arrow">←</span>`;
+    card.onclick = () => {
+      const newPath = pathLabels.concat([node.name]);
+      if (node.children.length){
+        libraryNavigate({ view:'node', node:node, path:newPath, label:newPath.join(' · ') });
+      } else {
+        libraryNavigate({ view:'videos', category:node.name, label:newPath.join(' · ') });
+      }
+    };
+    return card;
+  }
+
+  function renderLibraryNode(state){
+    updateLibraryNavButtons(state.label);
+    const node = state.node;
+    const el = document.getElementById('libraryList');
+    el.innerHTML = '';
+
+    const allCard = document.createElement('div');
+    allCard.className = 'lib-cat-card';
+    allCard.innerHTML = `<span class="name">כל ${escapeHtml(node.name)}</span><span class="arrow">←</span>`;
+    allCard.onclick = () => libraryNavigate({ view:'videos', category:node.name, label:state.path.join(' · ') + ' · כל' });
+    el.appendChild(allCard);
+
+    node.children.forEach(child => el.appendChild(buildLibraryCard(child, state.path)));
+  }
+
+  async function renderLibraryVideos(state){
+    currentLibraryCategory = state.category;
+    currentLibraryLabel = state.label;
+    updateLibraryNavButtons(state.label);
+    const el = document.getElementById('libraryList');
+    el.innerHTML = '<div class="empty">טוען...</div>';
+
+    const url = state.category
+      ? `${APPS_SCRIPT_URL}?action=approvedLibrary&password=${encodeURIComponent(PASSWORD)}&category=${encodeURIComponent(state.category)}`
+      : `${APPS_SCRIPT_URL}?action=approvedLibrary&password=${encodeURIComponent(PASSWORD)}`;
+    const res = await fetch(url);
+    const videos = await res.json();
+
+    if(!videos.length){ el.innerHTML = '<div class="empty">אין עדיין סרטונים כאן</div>'; return; }
+    el.innerHTML = '';
+    videos.forEach(v => {
+      const div = document.createElement('div');
+      div.className = 'row-card';
+      div.innerHTML = `
+        <img src="${v.Thumbnail}">
+        <div class="row-info">
+          <div class="row-title">${escapeHtml(v.Title)}</div>
+          <div class="row-sub">${escapeHtml(v.ChannelName)} · ${escapeHtml(v.Category)}</div>
+          <div class="row-actions">
+            <button class="btn-sm btn-remove" onclick="removeVideo('${v.VideoID}')">הסר מהספרייה</button>
+          </div>
+        </div>
+      `;
+      el.appendChild(div);
+    });
+  }
+
+  async function removeVideo(id){
+    await postAction({ action:'removeVideo', videoId:id });
+    showToast('הוסר');
+    libraryRenderState(libraryHistory[libraryHistoryIdx]);
+  }
+
+  // ---------- Helpers ----------
+  async function postAction(payload){
+    payload.password = PASSWORD;
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    return res.json();
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+</script>
+
+</body>
+</html>
