@@ -165,6 +165,47 @@
     font-weight:700;
     font-size: 13.5px;
   }
+  .new-playlist-row-admin{
+    display:flex;
+    gap:8px;
+  }
+  .new-playlist-row-admin input{
+    flex:1;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(198,161,82,0.3);
+    background: #0E0C0A;
+    color: var(--text);
+    font-size: 13.5px;
+  }
+  .new-playlist-row-admin button{
+    background: var(--gold);
+    color: var(--black);
+    border:none;
+    padding: 0 16px;
+    border-radius: 8px;
+    font-weight:700;
+    font-size: 12.5px;
+  }
+  .blocked-word-chip{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background: rgba(194,91,74,0.12);
+    border: 1px solid rgba(194,91,74,0.4);
+    border-radius: 14px;
+    padding: 5px 10px;
+    font-size: 11.5px;
+    color: var(--text);
+  }
+  .blocked-word-chip button{
+    background:none;
+    border:none;
+    color: var(--danger);
+    font-size: 13px;
+    padding:0;
+    cursor:pointer;
+  }
   .checkbox-row{
     display:flex;
     align-items:flex-start;
@@ -248,6 +289,27 @@
     font-weight:700;
   }
 
+  .lib-cat-card{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background: var(--card);
+    border: 1px solid rgba(198,161,82,0.15);
+    border-radius: 12px;
+    padding: 15px 16px;
+    margin-bottom: 10px;
+    cursor:pointer;
+  }
+  .lib-cat-card .name{
+    font-size: 14px;
+    font-weight:700;
+    color: var(--gold-light);
+  }
+  .lib-cat-card .arrow{
+    color: var(--text-dim);
+    font-size: 16px;
+  }
+
   .fetch-btn{
     width: 100%;
     background: transparent;
@@ -326,9 +388,41 @@
       <button onclick="addSubCategory()">הוסף תת-קטגוריה</button>
     </div>
     <div id="categoriesTreeList"><div class="empty">טוען...</div></div>
+
+    <div class="form-block" style="margin-top:20px;">
+      <h3>🛡️ סינון אוטומטי - מילים חסומות</h3>
+      <p style="font-size:11.5px; color:var(--text-dim); margin-bottom:10px; line-height:1.5;">
+        סרטון שבכותרת שלו מופיעה אחת מהמילים האלה, יישאר תמיד ב"ממתינים" לבדיקה שלך -
+        גם אם הוא מגיע מערוץ שסימנת כ"מהימן". תוכן בלי אף מילה חסומה מערוץ מהימן יעלה אוטומטית כרגיל.
+      </p>
+      <div class="new-playlist-row-admin">
+        <input type="text" id="newBlockedWord" placeholder="הוספת מילה לחסימה...">
+        <button onclick="addBlockedWord()">הוסף</button>
+      </div>
+      <div id="blockedWordsList" class="cat-subs" style="margin-top:12px;"></div>
+    </div>
+
+    <div class="form-block" style="margin-top:12px;">
+      <h3>✓ רשימה לבנה - אישור מהיר לבקשות משתמשים</h3>
+      <p style="font-size:11.5px; color:var(--text-dim); margin-bottom:10px; line-height:1.5;">
+        כשמשתמש שולח קישור דרך "בקשת תוכן" באתר, ואם הכותרת של הסרטון מכילה אחת מהמילים האלה
+        (למשל שם אמן שאתה כבר סומך עליו) - הסרטון עולה <b style="color:var(--gold-light);">מיד</b>,
+        בלי לחכות לאישור שלך. שאר הבקשות ימשיכו כרגיל ל"ממתינים".
+      </p>
+      <div class="new-playlist-row-admin">
+        <input type="text" id="newAllowedWord" placeholder="הוספת מילת מפתח מאושרת...">
+        <button onclick="addAllowedWord()">הוסף</button>
+      </div>
+      <div id="allowedWordsList" class="cat-subs" style="margin-top:12px;"></div>
+    </div>
   </div>
 
   <div class="tab-panel" id="tab-library">
+    <div id="libraryBreadcrumb" style="display:none; align-items:center; gap:8px; margin-bottom:12px;">
+      <button class="btn-sm btn-trust" id="libraryBackBtn" onclick="libraryGoBack()">→ חזרה</button>
+      <button class="btn-sm btn-trust" id="libraryForwardBtn" onclick="libraryGoForward()">קדימה ←</button>
+      <span id="libraryBreadcrumbText" style="font-size:12.5px; color:var(--text-dim);"></span>
+    </div>
     <div id="libraryList"><div class="empty">טוען...</div></div>
   </div>
 </div>
@@ -339,7 +433,7 @@
   // ========================================================
   // הגדרה - יש להחליף בכתובת ה-Apps Script שלך אחרי הפריסה
   // ========================================================
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJlaTRABHGgATAdX9pgt1pfwp4_0LveqihDGfUKo5TlXTnsSpXujZH6J3eha-lk6GmtA/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwh5_IUDS3rjUyAji5PKEDzwDYQILSZ0dLPaS3O0NVASxXa7Ou4M8og-UqA-ilwOxXr/exec';
 
   let PASSWORD = sessionStorage.getItem('solmusic_pw') || '';
 
@@ -382,7 +476,7 @@
       tab.classList.add('active');
       document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
       if(tab.dataset.tab === 'library') loadLibrary();
-      if(tab.dataset.tab === 'categories') loadCategoriesTree();
+      if(tab.dataset.tab === 'categories') { loadCategoriesTree(); loadBlockedWords(); loadAllowedWords(); }
     };
   });
 
@@ -511,18 +605,29 @@
         ? p.subcategories.map(s => `
             <div class="cat-sub-chip">
               <span>${escapeHtml(s)}</span>
-              <button onclick="removeCategory('${escapeHtml(s)}')">✕</button>
+              <button onclick="editCategory('${escapeHtml(s)}')" title="עריכה">✎</button>
+              <button onclick="removeCategory('${escapeHtml(s)}')" title="מחיקה">✕</button>
             </div>`).join('')
         : '<span style="font-size:11.5px; color:var(--text-dim);">אין תתי-קטגוריות עדיין</span>';
       group.innerHTML = `
         <div class="cat-group-head">
           <div class="cat-group-name">${escapeHtml(p.name)}</div>
-          <button class="btn-remove-sm" onclick="removeCategory('${escapeHtml(p.name)}')">הסר קטגוריה</button>
+          <div class="row-actions" style="margin-top:0;">
+            <button class="btn-remove-sm" style="border-color:var(--gold); color:var(--gold-light);" onclick="editCategory('${escapeHtml(p.name)}')">ערוך</button>
+            <button class="btn-remove-sm" onclick="removeCategory('${escapeHtml(p.name)}')">הסר</button>
+          </div>
         </div>
         <div class="cat-subs">${subsHtml}</div>
       `;
       el.appendChild(group);
     });
+  }
+
+  function editCategory(oldName){
+    const newName = prompt('שם חדש עבור "' + oldName + '":', oldName);
+    if (!newName || newName.trim() === '' || newName === oldName) return;
+    postAction({ action:'renameCategory', oldName:oldName, newName:newName.trim() })
+      .then(() => { showToast('השם עודכן'); loadCategoriesTree(); });
   }
 
   async function addParentCategory(){
@@ -550,6 +655,68 @@
     loadCategoriesTree();
   }
 
+  // ---------- Blocked words (safety filter) ----------
+  async function loadBlockedWords(){
+    const res = await fetch(`${APPS_SCRIPT_URL}?action=blockedWords&password=${encodeURIComponent(PASSWORD)}`);
+    const words = await res.json();
+    const el = document.getElementById('blockedWordsList');
+    if(!words.length){ el.innerHTML = '<span style="font-size:11.5px; color:var(--text-dim);">אין עדיין מילים חסומות</span>'; return; }
+    el.innerHTML = '';
+    words.forEach(w => {
+      const chip = document.createElement('div');
+      chip.className = 'blocked-word-chip';
+      chip.innerHTML = `<span>${escapeHtml(w)}</span><button onclick="removeBlockedWord('${escapeHtml(w)}')">✕</button>`;
+      el.appendChild(chip);
+    });
+  }
+
+  async function addBlockedWord(){
+    const input = document.getElementById('newBlockedWord');
+    const word = input.value.trim();
+    if(!word){ showToast('נא להזין מילה'); return; }
+    await postAction({ action:'addBlockedWord', word:word });
+    showToast('המילה נוספה לסינון');
+    input.value = '';
+    loadBlockedWords();
+  }
+
+  async function removeBlockedWord(word){
+    await postAction({ action:'removeBlockedWord', word:word });
+    showToast('הוסר מהסינון');
+    loadBlockedWords();
+  }
+
+  // ---------- Allowed words (whitelist for fast-tracking user requests) ----------
+  async function loadAllowedWords(){
+    const res = await fetch(`${APPS_SCRIPT_URL}?action=allowedWords&password=${encodeURIComponent(PASSWORD)}`);
+    const words = await res.json();
+    const el = document.getElementById('allowedWordsList');
+    if(!words.length){ el.innerHTML = '<span style="font-size:11.5px; color:var(--text-dim);">אין עדיין מילים ברשימה הלבנה</span>'; return; }
+    el.innerHTML = '';
+    words.forEach(w => {
+      const chip = document.createElement('div');
+      chip.className = 'cat-sub-chip';
+      chip.innerHTML = `<span>${escapeHtml(w)}</span><button onclick="removeAllowedWord('${escapeHtml(w)}')">✕</button>`;
+      el.appendChild(chip);
+    });
+  }
+
+  async function addAllowedWord(){
+    const input = document.getElementById('newAllowedWord');
+    const word = input.value.trim();
+    if(!word){ showToast('נא להזין מילה'); return; }
+    await postAction({ action:'addAllowedWord', word:word });
+    showToast('נוסף לרשימה הלבנה');
+    input.value = '';
+    loadAllowedWords();
+  }
+
+  async function removeAllowedWord(word){
+    await postAction({ action:'removeAllowedWord', word:word });
+    showToast('הוסר');
+    loadAllowedWords();
+  }
+
   async function loadChannels(){
     const res = await fetch(`${APPS_SCRIPT_URL}?action=channels&password=${encodeURIComponent(PASSWORD)}`);
     const channels = await res.json();
@@ -566,12 +733,22 @@
           <div class="row-sub">${escapeHtml(c.Category)} · ${escapeHtml(c.ChannelID)}</div>
           <div class="row-actions">
             ${isTrusted ? '' : `<button class="btn-sm btn-trust" onclick="trustChannel('${c.ChannelID}')">אשר את כל תוכן הערוץ</button>`}
+            <button class="btn-sm btn-trust" onclick="editChannel('${c.ChannelID}', '${escapeHtml(c.ChannelName)}')">ערוך</button>
             <button class="btn-sm btn-remove" onclick="removeChannel('${c.ChannelID}')">הסר ערוץ</button>
           </div>
         </div>
       `;
       el.appendChild(div);
     });
+  }
+
+  async function editChannel(id, currentName){
+    const newName = prompt('שם חדש לערוץ:', currentName);
+    if (newName === null) return;
+    const newCategory = prompt('קטגוריה חדשה (השאירי ריק כדי לא לשנות):', '') || '';
+    await postAction({ action:'editChannel', channelId:id, channelName:newName.trim() || null, category:newCategory.trim() || null });
+    showToast('הערוץ עודכן');
+    loadChannels();
   }
 
   async function trustChannel(id){
@@ -601,12 +778,128 @@
     loadChannels();
   }
 
-  // ---------- Library ----------
+  // ---------- Library (drill-down with back/forward history, like browser navigation) ----------
+  let currentLibraryCategory = null;
+  let currentLibraryLabel = '';
+  let libraryHistory = [];   // כל מסך שביקרנו בו, לפי סדר
+  let libraryHistoryIdx = -1; // המיקום הנוכחי בתוך ההיסטוריה
+
+  // ניווט "קדימה" למסך חדש - חותך כל היסטוריית "קדימה" ישנה (בדיוק כמו בדפדפן)
+  function libraryNavigate(state){
+    libraryHistory = libraryHistory.slice(0, libraryHistoryIdx + 1);
+    libraryHistory.push(state);
+    libraryHistoryIdx++;
+    libraryRenderState(state);
+  }
+
+  function libraryGoBack(){
+    if (libraryHistoryIdx <= 0) return;
+    libraryHistoryIdx--;
+    libraryRenderState(libraryHistory[libraryHistoryIdx]);
+  }
+
+  function libraryGoForward(){
+    if (libraryHistoryIdx >= libraryHistory.length - 1) return;
+    libraryHistoryIdx++;
+    libraryRenderState(libraryHistory[libraryHistoryIdx]);
+  }
+
+  function updateLibraryNavButtons(label){
+    const bc = document.getElementById('libraryBreadcrumb');
+    const backBtn = document.getElementById('libraryBackBtn');
+    const fwdBtn = document.getElementById('libraryForwardBtn');
+
+    bc.style.display = libraryHistoryIdx > 0 || libraryHistoryIdx < libraryHistory.length - 1 ? 'flex' : 'none';
+    backBtn.style.opacity = libraryHistoryIdx > 0 ? '1' : '0.35';
+    backBtn.disabled = libraryHistoryIdx <= 0;
+    fwdBtn.style.opacity = libraryHistoryIdx < libraryHistory.length - 1 ? '1' : '0.35';
+    fwdBtn.disabled = libraryHistoryIdx >= libraryHistory.length - 1;
+    document.getElementById('libraryBreadcrumbText').textContent = label || '';
+  }
+
+  // מפנה לפונקציית התצוגה המתאימה, בלי לגעת בהיסטוריה (משמש לרינדור מחדש בזמן back/forward)
+  function libraryRenderState(state){
+    if (state.view === 'categories') renderLibraryCategories(state);
+    else if (state.view === 'subcats') renderLibrarySubcats(state);
+    else if (state.view === 'videos') renderLibraryVideos(state);
+  }
+
   async function loadLibrary(){
-    const res = await fetch(`${APPS_SCRIPT_URL}?action=approvedLibrary&password=${encodeURIComponent(PASSWORD)}`);
-    const videos = await res.json();
+    libraryHistory = [];
+    libraryHistoryIdx = -1;
+    libraryNavigate({ view:'categories', label:'' });
+  }
+
+  async function renderLibraryCategories(state){
+    updateLibraryNavButtons(state.label);
     const el = document.getElementById('libraryList');
-    if(!videos.length){ el.innerHTML = '<div class="empty">אין עדיין סרטונים מאושרים</div>'; return; }
+    el.innerHTML = '<div class="empty">טוען...</div>';
+    const res = await fetch(`${APPS_SCRIPT_URL}?action=categoryTree`);
+    const tree = await res.json();
+
+    el.innerHTML = '';
+
+    const allCard = document.createElement('div');
+    allCard.className = 'lib-cat-card';
+    allCard.innerHTML = `<span class="name">כל הסרטונים</span><span class="arrow">←</span>`;
+    allCard.onclick = () => libraryNavigate({ view:'videos', category:null, label:'כל הסרטונים' });
+    el.appendChild(allCard);
+
+    if (!tree.length){
+      el.innerHTML += '<div class="empty">אין עדיין קטגוריות</div>';
+      return;
+    }
+
+    tree.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'lib-cat-card';
+      card.innerHTML = `<span class="name">${escapeHtml(p.name)}</span><span class="arrow">←</span>`;
+      card.onclick = () => {
+        if (p.subcategories.length){
+          libraryNavigate({ view:'subcats', parent:p, label:p.name });
+        } else {
+          libraryNavigate({ view:'videos', category:p.name, label:p.name });
+        }
+      };
+      el.appendChild(card);
+    });
+  }
+
+  function renderLibrarySubcats(state){
+    updateLibraryNavButtons(state.label);
+    const parent = state.parent;
+    const el = document.getElementById('libraryList');
+    el.innerHTML = '';
+
+    const allCard = document.createElement('div');
+    allCard.className = 'lib-cat-card';
+    allCard.innerHTML = `<span class="name">כל ${escapeHtml(parent.name)}</span><span class="arrow">←</span>`;
+    allCard.onclick = () => libraryNavigate({ view:'videos', category:parent.name, label:parent.name + ' · כל' });
+    el.appendChild(allCard);
+
+    parent.subcategories.forEach(sub => {
+      const card = document.createElement('div');
+      card.className = 'lib-cat-card';
+      card.innerHTML = `<span class="name">${escapeHtml(sub)}</span><span class="arrow">←</span>`;
+      card.onclick = () => libraryNavigate({ view:'videos', category:sub, label:parent.name + ' · ' + sub });
+      el.appendChild(card);
+    });
+  }
+
+  async function renderLibraryVideos(state){
+    currentLibraryCategory = state.category;
+    currentLibraryLabel = state.label;
+    updateLibraryNavButtons(state.label);
+    const el = document.getElementById('libraryList');
+    el.innerHTML = '<div class="empty">טוען...</div>';
+
+    const url = state.category
+      ? `${APPS_SCRIPT_URL}?action=approvedLibrary&password=${encodeURIComponent(PASSWORD)}&category=${encodeURIComponent(state.category)}`
+      : `${APPS_SCRIPT_URL}?action=approvedLibrary&password=${encodeURIComponent(PASSWORD)}`;
+    const res = await fetch(url);
+    const videos = await res.json();
+
+    if(!videos.length){ el.innerHTML = '<div class="empty">אין עדיין סרטונים כאן</div>'; return; }
     el.innerHTML = '';
     videos.forEach(v => {
       const div = document.createElement('div');
@@ -628,7 +921,7 @@
   async function removeVideo(id){
     await postAction({ action:'removeVideo', videoId:id });
     showToast('הוסר');
-    loadLibrary();
+    libraryRenderState(libraryHistory[libraryHistoryIdx]);
   }
 
   // ---------- Helpers ----------

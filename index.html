@@ -30,7 +30,8 @@
     --text: #F3E9D2;
     --text-dim: #9C9184;
   }
-  *{ margin:0; padding:0; box-sizing:border-box; }
+  *{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+  html{ scroll-behavior: smooth; }
   body{
     background: var(--black);
     color: var(--text);
@@ -90,11 +91,13 @@
     border:none;
     cursor:pointer;
     padding: 4px 2px;
+    transition: transform .12s ease;
   }
+  .top-cat-btn:active{ transform: scale(0.92); }
   .top-cat-circle{
     width: 54px;
     height: 54px;
-    border-radius: 50%;
+    border-radius: 14px;
     border: 1.4px solid rgba(198,161,82,0.4);
     display:flex;
     align-items:center;
@@ -127,12 +130,15 @@
   .subcat-modal{
     position:fixed; inset:0;
     background: rgba(0,0,0,0.85);
-    display:none;
+    display:flex;
     align-items:flex-end;
     justify-content:center;
     z-index: 900;
+    opacity:0;
+    pointer-events:none;
+    transition: opacity .25s ease;
   }
-  .subcat-modal.open{ display:flex; }
+  .subcat-modal.open{ opacity:1; pointer-events:auto; }
   .subcat-sheet{
     width:100%;
     max-width: 460px;
@@ -142,7 +148,10 @@
     border-top: 1px solid rgba(198,161,82,0.4);
     border-radius: 18px 18px 0 0;
     padding: 20px 18px 26px;
+    transform: translateY(30px);
+    transition: transform .25s ease;
   }
+  .subcat-modal.open .subcat-sheet{ transform: translateY(0); }
   .subcat-sheet h3{
     font-family:'Playfair Display', serif;
     color: var(--gold-light);
@@ -163,7 +172,9 @@
     font-weight:600;
     margin-bottom: 9px;
     cursor:pointer;
+    transition: transform .12s ease, background .12s ease;
   }
+  .subcat-item:active{ transform: scale(0.97); background: rgba(198,161,82,0.15); }
   .subcat-item.all-item{
     color: var(--gold-light);
     border-color: var(--gold);
@@ -175,6 +186,240 @@
     border:none;
     color: var(--text-dim);
     font-size: 13px;
+  }
+
+  /* ---------- Playlist add button on cards ---------- */
+  .add-playlist-btn{
+    position:absolute;
+    top:6px;
+    left:6px;
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    background: rgba(14,12,10,0.75);
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+    font-size: 16px;
+    line-height:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition: transform .15s ease, background .15s ease;
+  }
+  .add-playlist-btn:active{ transform: scale(0.85); background: var(--gold); color: var(--black); }
+
+  /* ---------- Floating playlists button ---------- */
+  .fab-playlists{
+    position:fixed;
+    bottom: 22px;
+    right: 18px;
+    background: transparent;
+    color: var(--gold-light);
+    border: 1px solid var(--gold);
+    border-radius: 24px;
+    padding: 12px 18px;
+    font-family:'Assistant', sans-serif;
+    font-weight:700;
+    font-size: 13px;
+    display:flex;
+    align-items:center;
+    gap:7px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+    z-index: 500;
+    transition: transform .15s ease;
+  }
+  .fab-playlists:active{ transform: scale(0.94); }
+  .fab-playlists svg{ width:16px; height:16px; }
+
+  /* ---------- Playlists modal ---------- */
+  .playlists-modal{
+    position:fixed; inset:0;
+    background: rgba(0,0,0,0.85);
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    z-index: 950;
+    opacity:0;
+    pointer-events:none;
+    transition: opacity .25s ease;
+  }
+  .playlists-modal.open{ opacity:1; pointer-events:auto; }
+  .playlists-sheet{
+    width:100%;
+    max-width: 460px;
+    max-height: 78vh;
+    overflow-y:auto;
+    background: var(--black-soft);
+    border-top: 1px solid rgba(198,161,82,0.4);
+    border-radius: 18px 18px 0 0;
+    padding: 20px 18px 26px;
+    transform: translateY(30px);
+    transition: transform .25s ease;
+  }
+  .playlists-modal.open .playlists-sheet{ transform: translateY(0); }
+  .playlists-sheet h3{
+    font-family:'Playfair Display', serif;
+    color: var(--gold-light);
+    font-size: 18px;
+    margin-bottom: 14px;
+    text-align:center;
+  }
+  .playlist-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background: var(--card);
+    border: 1px solid rgba(198,161,82,0.2);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 9px;
+    cursor:pointer;
+  }
+  .playlist-row .pl-name{ font-size:14px; font-weight:600; color:var(--text); }
+  .playlist-row .pl-count{ font-size:11.5px; color:var(--text-dim); margin-top:2px; }
+  .playlist-row .pl-del{
+    background:none; border:none; color: var(--danger); font-size:15px; padding:4px;
+  }
+  .new-playlist-row{
+    display:flex; gap:8px; margin-top:14px;
+  }
+  .new-playlist-row input{
+    flex:1;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(198,161,82,0.3);
+    background: var(--card);
+    color: var(--text);
+    font-family:'Assistant', sans-serif;
+    font-size: 13.5px;
+  }
+  .new-playlist-row button{
+    background: var(--gold);
+    color: var(--black);
+    border:none;
+    border-radius: 10px;
+    padding: 0 18px;
+    font-weight:700;
+    font-size: 13px;
+  }
+  .modal-close.secondary{
+    border-color: rgba(198,161,82,0.3);
+    color: var(--text-dim);
+  }
+  .empty-inline{
+    text-align:center;
+    color: var(--text-dim);
+    font-size: 13px;
+    padding: 18px 0;
+  }
+  .quick-add-list .subcat-item{
+    text-align:right;
+  }
+
+  /* ---------- YouTube Premium banner ---------- */
+  .premium-banner{
+    margin: 4px 16px 6px;
+    background: linear-gradient(135deg, rgba(198,161,82,0.14), rgba(198,161,82,0.04));
+    border: 1px solid rgba(198,161,82,0.35);
+    border-radius: 14px;
+    padding: 12px 14px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    cursor:pointer;
+    transition: transform .12s ease;
+  }
+  .premium-banner:active{ transform: scale(0.98); }
+  .premium-banner .yt-icon{
+    flex-shrink:0;
+    width: 34px;
+    height: 34px;
+  }
+  .premium-banner .txt{ flex:1; }
+  .premium-banner .txt .t1{
+    font-size: 12.5px;
+    font-weight:700;
+    color: var(--gold-light);
+  }
+  .premium-banner .txt .t2{
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .premium-banner .close-x{
+    background:none;
+    border:none;
+    color: var(--text-dim);
+    font-size: 15px;
+    padding: 4px;
+    flex-shrink:0;
+  }
+
+  /* ---------- First-launch premium intro modal ---------- */
+  .premium-intro-modal{
+    position:fixed; inset:0;
+    background: rgba(0,0,0,0.88);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index: 1000;
+    padding: 20px;
+    opacity:0;
+    pointer-events:none;
+    transition: opacity .25s ease;
+  }
+  .premium-intro-modal.open{ opacity:1; pointer-events:auto; }
+  .premium-intro-card{
+    width:100%;
+    max-width: 380px;
+    background: var(--black-soft);
+    border: 1px solid rgba(198,161,82,0.4);
+    border-radius: 18px;
+    padding: 28px 24px 24px;
+    text-align:center;
+    transform: scale(0.92);
+    transition: transform .25s ease;
+  }
+  .premium-intro-modal.open .premium-intro-card{ transform: scale(1); }
+  .premium-intro-card .yt-icon-big{
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 16px;
+  }
+  .premium-intro-card h3{
+    font-family:'Playfair Display', serif;
+    color: var(--gold-light);
+    font-size: 19px;
+    margin-bottom: 10px;
+  }
+  .premium-intro-card p{
+    font-size: 13.5px;
+    color: var(--text-dim);
+    line-height:1.6;
+    margin-bottom: 22px;
+  }
+  .premium-intro-card .btn-row{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .premium-intro-card .btn-primary{
+    background: var(--gold);
+    color: var(--black);
+    border:none;
+    padding: 13px;
+    border-radius: 12px;
+    font-weight:700;
+    font-size: 14px;
+    font-family:'Assistant', sans-serif;
+  }
+  .premium-intro-card .btn-skip{
+    background: transparent;
+    border:none;
+    color: var(--text-dim);
+    font-size: 12.5px;
+    padding: 4px;
   }
 
   /* ---------- Search bar ---------- */
@@ -258,6 +503,20 @@
     overflow:hidden;
     border: 1px solid rgba(198,161,82,0.15);
     cursor:pointer;
+    transition: transform .12s ease;
+    animation: fadeInUp .35s ease both;
+  }
+  .video-card:active{ transform: scale(0.96); }
+  .grid .video-card:nth-child(1){ animation-delay: .00s; }
+  .grid .video-card:nth-child(2){ animation-delay: .03s; }
+  .grid .video-card:nth-child(3){ animation-delay: .06s; }
+  .grid .video-card:nth-child(4){ animation-delay: .09s; }
+  .grid .video-card:nth-child(5){ animation-delay: .12s; }
+  .grid .video-card:nth-child(6){ animation-delay: .15s; }
+  .grid .video-card:nth-child(n+7){ animation-delay: .18s; }
+  @keyframes fadeInUp{
+    from{ opacity:0; transform: translateY(10px); }
+    to{ opacity:1; transform: translateY(0); }
   }
   .thumb-wrap{
     position:relative;
@@ -305,17 +564,23 @@
   .modal{
     position:fixed; inset:0;
     background: rgba(0,0,0,0.92);
-    display:none;
+    display:flex;
     align-items:center;
     justify-content:center;
     z-index: 999;
     padding: 16px;
+    opacity:0;
+    pointer-events:none;
+    transition: opacity .2s ease;
   }
-  .modal.open{ display:flex; }
+  .modal.open{ opacity:1; pointer-events:auto; }
   .modal-content{
     width:100%;
     max-width: 520px;
+    transform: scale(0.94);
+    transition: transform .2s ease;
   }
+  .modal.open .modal-content{ transform: scale(1); }
   .player-frame{
     position:relative;
     width:100%;
@@ -365,18 +630,23 @@
     gap:7px;
     box-shadow: 0 4px 14px rgba(0,0,0,0.5);
     z-index: 500;
+    transition: transform .15s ease;
   }
+  .fab-request:active{ transform: scale(0.94); }
   .fab-request svg{ width:16px; height:16px; }
 
   .request-modal{
     position:fixed; inset:0;
     background: rgba(0,0,0,0.85);
-    display:none;
+    display:flex;
     align-items:flex-end;
     justify-content:center;
     z-index: 998;
+    opacity:0;
+    pointer-events:none;
+    transition: opacity .25s ease;
   }
-  .request-modal.open{ display:flex; }
+  .request-modal.open{ opacity:1; pointer-events:auto; }
   .request-sheet{
     width:100%;
     max-width: 460px;
@@ -384,7 +654,10 @@
     border-top: 1px solid rgba(198,161,82,0.4);
     border-radius: 18px 18px 0 0;
     padding: 22px 20px 26px;
+    transform: translateY(30px);
+    transition: transform .25s ease;
   }
+  .request-modal.open .request-sheet{ transform: translateY(0); }
   .request-sheet h3{
     font-family:'Playfair Display', serif;
     color: var(--gold-light);
@@ -510,6 +783,28 @@
   </div>
 </div>
 
+<div class="premium-banner" id="premiumBanner" onclick="goToYouTubePremium()">
+  <svg class="yt-icon" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#FF0000"/><path d="M19 15L34 24L19 33V15Z" fill="white"/></svg>
+  <div class="txt">
+    <div class="t1">רוצים לצפות ללא פרסומות?</div>
+    <div class="t2">הצטרפו ל-YouTube Premium</div>
+  </div>
+  <button class="close-x" onclick="event.stopPropagation(); dismissPremiumBanner()">✕</button>
+</div>
+
+<!-- First-launch YouTube Premium intro -->
+<div class="premium-intro-modal" id="premiumIntroModal">
+  <div class="premium-intro-card">
+    <svg class="yt-icon-big" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#FF0000"/><path d="M19 15L34 24L19 33V15Z" fill="white"/></svg>
+    <h3>רוצים לצפות ללא פרסומות?</h3>
+    <p>ברוכים הבאים ל-Sol Music! אפשר ליהנות מכל הצפייה בלי הפרעות פרסומת דרך מנוי YouTube Premium.</p>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goToYouTubePremium(); closePremiumIntro();">מעבר ל-YouTube Premium</button>
+      <button class="btn-skip" onclick="closePremiumIntro()">אולי מאוחר יותר</button>
+    </div>
+  </div>
+</div>
+
 <div class="top-cats" id="topCats"></div>
 <div class="current-filter-label" id="currentFilterLabel"></div>
 
@@ -532,6 +827,12 @@
   בקשת תוכן
 </button>
 
+<!-- Playlists Button -->
+<button class="fab-playlists" onclick="openPlaylistsModal()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#E6C682" stroke-width="2.2"><path d="M4 6h16M4 12h10M4 18h10"/><circle cx="18" cy="18" r="2.4"/></svg>
+  הפלייליסטים שלי
+</button>
+
 <!-- Request Content Modal -->
 <div class="request-modal" id="requestModal">
   <div class="request-sheet">
@@ -543,6 +844,32 @@
       <button class="cancel-btn" onclick="closeRequestModal()">ביטול</button>
       <button class="submit-btn" onclick="submitRequest()">שליחת בקשה</button>
     </div>
+  </div>
+</div>
+
+<!-- Playlists List Modal (main view: all playlists, or one playlist's videos) -->
+<div class="playlists-modal" id="playlistsModal">
+  <div class="playlists-sheet">
+    <h3 id="playlistsTitle">הפלייליסטים שלי</h3>
+    <div id="playlistsBody"></div>
+    <div class="new-playlist-row" id="newPlaylistRow">
+      <input type="text" id="newPlaylistNameInput" placeholder="שם פלייליסט חדש...">
+      <button onclick="createPlaylist()">צור</button>
+    </div>
+    <button class="modal-close secondary" onclick="closePlaylistsModal()">סגירה</button>
+  </div>
+</div>
+
+<!-- Quick "Add to playlist" Modal -->
+<div class="playlists-modal" id="quickAddModal">
+  <div class="playlists-sheet">
+    <h3>הוספה לפלייליסט</h3>
+    <div id="quickAddList" class="quick-add-list"></div>
+    <div class="new-playlist-row">
+      <input type="text" id="quickNewPlaylistName" placeholder="או צרי פלייליסט חדש...">
+      <button onclick="quickCreateAndAdd()">צור והוסף</button>
+    </div>
+    <button class="modal-close secondary" onclick="closeQuickAddModal()">סגירה</button>
   </div>
 </div>
 
@@ -559,7 +886,7 @@
   // ========================================================
   // הגדרה - יש להחליף בכתובת ה-Apps Script שלך אחרי הפריסה
   // ========================================================
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJlaTRABHGgATAdX9pgt1pfwp4_0LveqihDGfUKo5TlXTnsSpXujZH6J3eha-lk6GmtA/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwh5_IUDS3rjUyAji5PKEDzwDYQILSZ0dLPaS3O0NVASxXa7Ou4M8og-UqA-ilwOxXr/exec';
 
   const topCatsEl = document.getElementById('topCats');
   const filterLabelEl = document.getElementById('currentFilterLabel');
@@ -736,6 +1063,7 @@
         <div class="play-badge">
           <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="rgba(0,0,0,0.55)" stroke="#E6C682" stroke-width="1.2"/><path d="M10 8.5L16 12L10 15.5V8.5Z" fill="#E6C682"/></svg>
         </div>
+        <button class="add-playlist-btn" onclick="event.stopPropagation(); openAddToPlaylist('${v.VideoID}', '${escapeAttr(v.Title)}', '${escapeAttr(v.Thumbnail)}', '${escapeAttr(v.ChannelName)}')">+</button>
       </div>
       <div class="video-info">
         <div class="video-title">${escapeHtml(v.Title)}</div>
@@ -744,6 +1072,10 @@
     `;
     card.onclick = () => openPlayer(v.VideoID, v.Title);
     return card;
+  }
+
+  function escapeAttr(str){
+    return (str || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
   }
 
   function escapeHtml(str){
@@ -764,8 +1096,214 @@
     document.getElementById('playerModal').classList.remove('open');
   }
 
+  // ========================================================
+  // פלייליסטים - נשמרים בזיכרון הדפדפן של המשתמש (localStorage),
+  // כי אין מערכת התחברות/משתמשים באתר. כל מבקר בונה פלייליסטים משלו,
+  // שנשארים אצלו בין ביקורים באותו מכשיר/דפדפן.
+  // ========================================================
+  const PLAYLISTS_KEY = 'solmusic_playlists_v1';
+  let pendingAddVideo = null; // הסרטון שממתין להוספה, בזמן שפתוח חלון "הוספה לפלייליסט"
+
+  function getPlaylists(){
+    try{
+      const raw = localStorage.getItem(PLAYLISTS_KEY);
+      return raw ? JSON.parse(raw) : {};
+    }catch(err){ return {}; }
+  }
+
+  function savePlaylists(playlists){
+    localStorage.setItem(PLAYLISTS_KEY, JSON.stringify(playlists));
+  }
+
+  function makePlaylistId(){
+    return 'pl_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+  }
+
+  // ---------- "הפלייליסטים שלי" - מסך ראשי ----------
+  function openPlaylistsModal(){
+    document.getElementById('playlistsModal').classList.add('open');
+    renderPlaylistsHome();
+  }
+
+  function closePlaylistsModal(){
+    document.getElementById('playlistsModal').classList.remove('open');
+  }
+
+  function renderPlaylistsHome(){
+    document.getElementById('playlistsTitle').textContent = 'הפלייליסטים שלי';
+    document.getElementById('newPlaylistRow').style.display = 'flex';
+    const playlists = getPlaylists();
+    const ids = Object.keys(playlists);
+    const body = document.getElementById('playlistsBody');
+
+    if (!ids.length){
+      body.innerHTML = '<div class="empty-inline">עדיין לא יצרת פלייליסטים. לחצי על ה-+ בכל סרטון כדי להתחיל!</div>';
+      return;
+    }
+
+    body.innerHTML = '';
+    ids.forEach(id => {
+      const pl = playlists[id];
+      const row = document.createElement('div');
+      row.className = 'playlist-row';
+      row.innerHTML = `
+        <div onclick="openPlaylistView('${id}')" style="flex:1;">
+          <div class="pl-name">${escapeHtml(pl.name)}</div>
+          <div class="pl-count">${pl.videos.length} סרטונים</div>
+        </div>
+        <button class="pl-del" onclick="event.stopPropagation(); deletePlaylist('${id}')">✕</button>
+      `;
+      body.appendChild(row);
+    });
+  }
+
+  function createPlaylist(){
+    const input = document.getElementById('newPlaylistNameInput');
+    const name = input.value.trim();
+    if (!name) return;
+    const playlists = getPlaylists();
+    const id = makePlaylistId();
+    playlists[id] = { name, videos: [] };
+    savePlaylists(playlists);
+    input.value = '';
+    renderPlaylistsHome();
+  }
+
+  function deletePlaylist(id){
+    const playlists = getPlaylists();
+    delete playlists[id];
+    savePlaylists(playlists);
+    renderPlaylistsHome();
+  }
+
+  // ---------- צפייה בתוך פלייליסט ספציפי ----------
+  function openPlaylistView(id){
+    const playlists = getPlaylists();
+    const pl = playlists[id];
+    if (!pl) return;
+
+    document.getElementById('playlistsTitle').innerHTML =
+      `<button onclick="renderPlaylistsHome()" style="background:none;border:none;color:var(--gold-light);font-size:14px;margin-left:8px;">→</button>${escapeHtml(pl.name)}`;
+    document.getElementById('newPlaylistRow').style.display = 'none';
+
+    const body = document.getElementById('playlistsBody');
+    if (!pl.videos.length){
+      body.innerHTML = '<div class="empty-inline">הפלייליסט עדיין ריק</div>';
+      return;
+    }
+
+    body.innerHTML = '';
+    pl.videos.forEach(v => {
+      const row = document.createElement('div');
+      row.className = 'playlist-row';
+      row.innerHTML = `
+        <div onclick="closePlaylistsModal(); openPlayer('${v.VideoID}', '${escapeAttr(v.Title)}')" style="flex:1; display:flex; align-items:center; gap:10px;">
+          <img src="${v.Thumbnail}" style="width:52px; height:32px; object-fit:cover; border-radius:5px;">
+          <div>
+            <div class="pl-name" style="font-size:12.5px;">${escapeHtml(v.Title)}</div>
+            <div class="pl-count">${escapeHtml(v.ChannelName)}</div>
+          </div>
+        </div>
+        <button class="pl-del" onclick="event.stopPropagation(); removeFromPlaylist('${id}', '${v.VideoID}')">✕</button>
+      `;
+      body.appendChild(row);
+    });
+  }
+
+  function removeFromPlaylist(playlistId, videoId){
+    const playlists = getPlaylists();
+    if (!playlists[playlistId]) return;
+    playlists[playlistId].videos = playlists[playlistId].videos.filter(v => v.VideoID !== videoId);
+    savePlaylists(playlists);
+    openPlaylistView(playlistId);
+  }
+
+  // ---------- הוספה מהירה מכרטיס סרטון ----------
+  function openAddToPlaylist(videoId, title, thumbnail, channelName){
+    pendingAddVideo = { VideoID:videoId, Title:title, Thumbnail:thumbnail, ChannelName:channelName };
+    const playlists = getPlaylists();
+    const ids = Object.keys(playlists);
+    const list = document.getElementById('quickAddList');
+
+    if (!ids.length){
+      list.innerHTML = '<div class="empty-inline">אין עדיין פלייליסטים - צרי אחד למטה</div>';
+    } else {
+      list.innerHTML = '';
+      ids.forEach(id => {
+        const pl = playlists[id];
+        const already = pl.videos.some(v => v.VideoID === videoId);
+        const btn = document.createElement('button');
+        btn.className = 'subcat-item' + (already ? ' all-item' : '');
+        btn.textContent = already ? `${pl.name} (כבר נמצא ✓)` : pl.name;
+        btn.onclick = () => addPendingVideoToPlaylist(id);
+        list.appendChild(btn);
+      });
+    }
+
+    document.getElementById('quickAddModal').classList.add('open');
+  }
+
+  function closeQuickAddModal(){
+    document.getElementById('quickAddModal').classList.remove('open');
+    pendingAddVideo = null;
+  }
+
+  function addPendingVideoToPlaylist(playlistId){
+    if (!pendingAddVideo) return;
+    const playlists = getPlaylists();
+    const pl = playlists[playlistId];
+    if (!pl) return;
+    if (!pl.videos.some(v => v.VideoID === pendingAddVideo.VideoID)){
+      pl.videos.push(pendingAddVideo);
+      savePlaylists(playlists);
+    }
+    closeQuickAddModal();
+  }
+
+  function quickCreateAndAdd(){
+    const input = document.getElementById('quickNewPlaylistName');
+    const name = input.value.trim();
+    if (!name || !pendingAddVideo) return;
+    const playlists = getPlaylists();
+    const id = makePlaylistId();
+    playlists[id] = { name, videos: [pendingAddVideo] };
+    savePlaylists(playlists);
+    input.value = '';
+    closeQuickAddModal();
+  }
+
   loadCategories();
   loadVideos('all');
+
+  // ========================================================
+  // YouTube Premium - קישור נוח בלבד, לא מנוי "דרך" האפליקציה בפועל.
+  // ההרשמה והתשלום קורים אצל גוגל עצמם, אין לאתר הזה שום מעורבות בכסף.
+  // ========================================================
+  function goToYouTubePremium(){
+    window.open('https://www.youtube.com/premium', '_blank');
+  }
+
+  // באנר קבוע - אפשר לסגור אותו, וההעדפה נשמרת כדי שלא יופיע שוב
+  const PREMIUM_BANNER_KEY = 'solmusic_premium_banner_dismissed';
+  if (localStorage.getItem(PREMIUM_BANNER_KEY) === '1') {
+    document.getElementById('premiumBanner').style.display = 'none';
+  }
+  function dismissPremiumBanner(){
+    document.getElementById('premiumBanner').style.display = 'none';
+    localStorage.setItem(PREMIUM_BANNER_KEY, '1');
+  }
+
+  // הודעת פתיחה - מוצגת פעם אחת בלבד, בפתיחה הראשונה של האפליקציה אי פעם במכשיר הזה
+  const PREMIUM_INTRO_KEY = 'solmusic_seen_premium_intro';
+  if (!localStorage.getItem(PREMIUM_INTRO_KEY)) {
+    setTimeout(() => {
+      document.getElementById('premiumIntroModal').classList.add('open');
+    }, 600);
+  }
+  function closePremiumIntro(){
+    document.getElementById('premiumIntroModal').classList.remove('open');
+    localStorage.setItem(PREMIUM_INTRO_KEY, '1');
+  }
 
   // ========================================================
   // בקשת תוכן - כל משתמש יכול להזין קישור לסרטון, זה נכנס
@@ -814,7 +1352,9 @@
       const data = await res.json();
 
       if (data.success){
-        msgEl.textContent = 'הבקשה נשלחה! התוכן יעלה לאחר אישור';
+        msgEl.textContent = data.fastTracked
+          ? 'התוכן אושר אוטומטית וכבר זמין באפליקציה! 🎉'
+          : 'הבקשה נשלחה! התוכן יעלה לאחר אישור';
         msgEl.className = 'request-msg success';
         setTimeout(closeRequestModal, 1800);
       } else {
@@ -846,7 +1386,7 @@
       return;
     }
     // דיליי קצר כדי לא לשלוח בקשה על כל תו שמוקלד
-    searchTimeout = setTimeout(() => runSearch(q), 400);
+    searchTimeout = setTimeout(() => runSearch(q), 600);
   });
 
   function clearSearch(){
@@ -868,15 +1408,20 @@
     filterLabelEl.innerHTML = '';
     showSkeleton();
     try{
-      const url = `${APPS_SCRIPT_URL}?action=search&q=${encodeURIComponent(query)}`;
+      const url = `${APPS_SCRIPT_URL}?action=smartSearch&q=${encodeURIComponent(query)}`;
       const res = await fetch(url);
-      const videos = await res.json();
+      const data = await res.json();
+      const videos = data.videos || [];
 
       const label = document.createElement('div');
       label.className = 'search-results-label';
-      label.innerHTML = videos.length
-        ? `נמצאו <b>${videos.length}</b> תוצאות עבור "${escapeHtml(query)}"`
-        : `אין תוצאות עבור "${escapeHtml(query)}"`;
+      if (data.liveSearched){
+        label.innerHTML = `נמצאו <b>${videos.length}</b> תוצאות עבור "${escapeHtml(query)}" · <span style="color:#6FA37A;">תוכן טרי מיוטיוב ✓</span>`;
+      } else {
+        label.innerHTML = videos.length
+          ? `נמצאו <b>${videos.length}</b> תוצאות עבור "${escapeHtml(query)}"`
+          : `אין תוצאות עבור "${escapeHtml(query)}"`;
+      }
 
       renderVideos(videos);
       contentEl.insertBefore(label, contentEl.firstChild);
