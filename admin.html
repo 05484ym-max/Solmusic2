@@ -165,6 +165,88 @@
     font-weight:700;
     font-size: 13.5px;
   }
+  .checkbox-row{
+    display:flex;
+    align-items:flex-start;
+    gap:8px;
+    margin-bottom: 14px;
+    font-size: 12.5px;
+    color: var(--text-dim);
+    cursor:pointer;
+  }
+  .checkbox-row input{
+    width:auto;
+    margin: 2px 0 0 0;
+    accent-color: var(--gold);
+  }
+  .trusted-badge{
+    display:inline-block;
+    background: rgba(111,163,122,0.15);
+    color: var(--success);
+    border: 1px solid var(--success);
+    border-radius: 10px;
+    padding: 2px 9px;
+    font-size: 10.5px;
+    font-weight:700;
+    margin-right: 6px;
+  }
+  .btn-trust{
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+  }
+
+  .cat-group{
+    background: var(--card);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(198,161,82,0.15);
+  }
+  .cat-group-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .cat-group-name{
+    font-size: 14px;
+    font-weight:700;
+    color: var(--gold-light);
+  }
+  .cat-subs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    margin-top: 10px;
+  }
+  .cat-sub-chip{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background: rgba(198,161,82,0.1);
+    border: 1px solid rgba(198,161,82,0.25);
+    border-radius: 14px;
+    padding: 5px 10px;
+    font-size: 11.5px;
+    color: var(--text);
+  }
+  .cat-sub-chip button{
+    background:none;
+    border:none;
+    color: var(--danger);
+    font-size: 13px;
+    padding:0;
+    cursor:pointer;
+  }
+  .btn-remove-sm{
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    border-radius: 12px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight:700;
+  }
 
   .fetch-btn{
     width: 100%;
@@ -203,11 +285,16 @@
   <div class="tabs">
     <div class="tab active" data-tab="pending">ממתינים</div>
     <div class="tab" data-tab="channels">ערוצים</div>
+    <div class="tab" data-tab="categories">קטגוריות</div>
     <div class="tab" data-tab="library">ספרייה</div>
   </div>
 
   <div class="tab-panel active" id="tab-pending">
     <button class="fetch-btn" onclick="fetchNow()">🔄 בדוק עכשיו סרטונים חדשים מהערוצים</button>
+    <div class="form-block" style="padding:12px;">
+      <input type="text" id="pendingFilter" placeholder="חיפוש לפי שם שיר או שם ערוץ..." oninput="filterPending()" style="margin-bottom:8px;">
+      <button id="approveAllBtn" class="fetch-btn" style="display:none; border-color: var(--success); color: var(--success); margin-bottom:0;" onclick="approveAllFiltered()">✓ אשר את כל התוצאות המסוננות</button>
+    </div>
     <div id="pendingList"><div class="empty">טוען...</div></div>
   </div>
 
@@ -217,9 +304,28 @@
       <input type="text" id="newChannelId" placeholder="Channel ID (מתחיל ב-UC...)">
       <input type="text" id="newChannelName" placeholder="שם הערוץ (לתצוגה)">
       <select id="newChannelCategory"></select>
+      <label class="checkbox-row">
+        <input type="checkbox" id="newChannelAutoApprove">
+        <span>אשר אוטומטית את כל תוכן הערוץ הזה (בלי לעבור אישור ידני)</span>
+      </label>
       <button onclick="addChannel()">הוסף ערוץ</button>
     </div>
     <div id="channelsList"><div class="empty">טוען...</div></div>
+  </div>
+
+  <div class="tab-panel" id="tab-categories">
+    <div class="form-block">
+      <h3>הוספת קטגוריה ראשית</h3>
+      <input type="text" id="newParentCatName" placeholder="שם הקטגוריה (למשל: מוזיקה)">
+      <button onclick="addParentCategory()">הוסף קטגוריה ראשית</button>
+    </div>
+    <div class="form-block">
+      <h3>הוספת תת-קטגוריה</h3>
+      <select id="subCatParentSelect"></select>
+      <input type="text" id="newSubCatName" placeholder="שם תת-הקטגוריה (למשל: ישי ריבו)">
+      <button onclick="addSubCategory()">הוסף תת-קטגוריה</button>
+    </div>
+    <div id="categoriesTreeList"><div class="empty">טוען...</div></div>
   </div>
 
   <div class="tab-panel" id="tab-library">
@@ -233,7 +339,7 @@
   // ========================================================
   // הגדרה - יש להחליף בכתובת ה-Apps Script שלך אחרי הפריסה
   // ========================================================
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyT7FlY6OokaSYWskcNcz1fNJ6Ceq5cHhA8mNP87xgxw3aM1XA7n8BHcicFpgy01SWh/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJlaTRABHGgATAdX9pgt1pfwp4_0LveqihDGfUKo5TlXTnsSpXujZH6J3eha-lk6GmtA/exec';
 
   let PASSWORD = sessionStorage.getItem('solmusic_pw') || '';
 
@@ -276,6 +382,7 @@
       tab.classList.add('active');
       document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
       if(tab.dataset.tab === 'library') loadLibrary();
+      if(tab.dataset.tab === 'categories') loadCategoriesTree();
     };
   });
 
@@ -287,17 +394,62 @@
   }
 
   // ---------- Pending ----------
+  let allPendingVideos = [];
+  let currentPendingFilter = '';
+
   function renderPending(list){
+    allPendingVideos = list;
+    applyPendingFilter();
+  }
+
+  function applyPendingFilter(){
+    const q = currentPendingFilter.trim().toLowerCase();
+    const filtered = q
+      ? allPendingVideos.filter(v =>
+          (v.Title && v.Title.toLowerCase().indexOf(q) !== -1) ||
+          (v.ChannelName && v.ChannelName.toLowerCase().indexOf(q) !== -1))
+      : allPendingVideos;
+
+    const approveAllBtn = document.getElementById('approveAllBtn');
+    approveAllBtn.style.display = (q && filtered.length) ? 'block' : 'none';
+    approveAllBtn.textContent = `✓ אשר את כל ${filtered.length} התוצאות המסוננות`;
+
+    renderPendingList(filtered);
+  }
+
+  function filterPending(){
+    currentPendingFilter = document.getElementById('pendingFilter').value;
+    applyPendingFilter();
+  }
+
+  async function approveAllFiltered(){
+    const q = currentPendingFilter.trim().toLowerCase();
+    const filtered = allPendingVideos.filter(v =>
+      (v.Title && v.Title.toLowerCase().indexOf(q) !== -1) ||
+      (v.ChannelName && v.ChannelName.toLowerCase().indexOf(q) !== -1));
+
+    showToast(`מאשר ${filtered.length} סרטונים...`);
+    for (const v of filtered) {
+      await postAction({ action:'approve', videoId:v.VideoID });
+    }
+    showToast('כל התוצאות אושרו ✓');
+    document.getElementById('pendingFilter').value = '';
+    currentPendingFilter = '';
+    reloadPending();
+  }
+
+  function renderPendingList(list){
     const el = document.getElementById('pendingList');
     if(!list.length){ el.innerHTML = '<div class="empty">אין סרטונים ממתינים כרגע</div>'; return; }
     el.innerHTML = '';
     list.forEach(v => {
+      const isUserRequest = v.Source === 'user';
       const div = document.createElement('div');
       div.className = 'row-card';
       div.innerHTML = `
         <img src="${v.Thumbnail}">
         <div class="row-info">
-          <div class="row-title">${escapeHtml(v.Title)}</div>
+          <div class="row-title">${isUserRequest ? '<span class="trusted-badge" style="background:rgba(198,161,82,0.15); color:var(--gold-light); border-color:var(--gold-light);">בקשת משתמש</span>' : ''}${escapeHtml(v.Title)}</div>
           <div class="row-sub">${escapeHtml(v.ChannelName)} · ${escapeHtml(v.Category)}</div>
           <div class="row-actions">
             <button class="btn-sm btn-approve" onclick="approveVideo('${v.VideoID}')">אשר</button>
@@ -340,6 +492,64 @@
     sel.innerHTML = cats.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
   }
 
+  // ---------- Categories (tree management) ----------
+  async function loadCategoriesTree(){
+    const res = await fetch(`${APPS_SCRIPT_URL}?action=categoryTree`);
+    const tree = await res.json();
+
+    // ממלאים את הבורר של "לאיזו קטגוריה ראשית להוסיף תת-קטגוריה"
+    const parentSel = document.getElementById('subCatParentSelect');
+    parentSel.innerHTML = tree.map(p => `<option value="${escapeHtml(p.name)}">${escapeHtml(p.name)}</option>`).join('');
+
+    const el = document.getElementById('categoriesTreeList');
+    if(!tree.length){ el.innerHTML = '<div class="empty">אין עדיין קטגוריות</div>'; return; }
+    el.innerHTML = '';
+    tree.forEach(p => {
+      const group = document.createElement('div');
+      group.className = 'cat-group';
+      const subsHtml = p.subcategories.length
+        ? p.subcategories.map(s => `
+            <div class="cat-sub-chip">
+              <span>${escapeHtml(s)}</span>
+              <button onclick="removeCategory('${escapeHtml(s)}')">✕</button>
+            </div>`).join('')
+        : '<span style="font-size:11.5px; color:var(--text-dim);">אין תתי-קטגוריות עדיין</span>';
+      group.innerHTML = `
+        <div class="cat-group-head">
+          <div class="cat-group-name">${escapeHtml(p.name)}</div>
+          <button class="btn-remove-sm" onclick="removeCategory('${escapeHtml(p.name)}')">הסר קטגוריה</button>
+        </div>
+        <div class="cat-subs">${subsHtml}</div>
+      `;
+      el.appendChild(group);
+    });
+  }
+
+  async function addParentCategory(){
+    const name = document.getElementById('newParentCatName').value.trim();
+    if(!name){ showToast('נא להזין שם קטגוריה'); return; }
+    await postAction({ action:'addCategory', name:name });
+    showToast('הקטגוריה נוספה');
+    document.getElementById('newParentCatName').value = '';
+    loadCategoriesTree();
+  }
+
+  async function addSubCategory(){
+    const parent = document.getElementById('subCatParentSelect').value;
+    const name = document.getElementById('newSubCatName').value.trim();
+    if(!name){ showToast('נא להזין שם תת-קטגוריה'); return; }
+    await postAction({ action:'addCategory', name:name, parentCategory:parent });
+    showToast('תת-הקטגוריה נוספה');
+    document.getElementById('newSubCatName').value = '';
+    loadCategoriesTree();
+  }
+
+  async function removeCategory(name){
+    await postAction({ action:'removeCategory', name:name });
+    showToast('הוסר');
+    loadCategoriesTree();
+  }
+
   async function loadChannels(){
     const res = await fetch(`${APPS_SCRIPT_URL}?action=channels&password=${encodeURIComponent(PASSWORD)}`);
     const channels = await res.json();
@@ -347,13 +557,15 @@
     if(!channels.length){ el.innerHTML = '<div class="empty">עדיין לא נוספו ערוצים</div>'; return; }
     el.innerHTML = '';
     channels.forEach(c => {
+      const isTrusted = c.AutoApprove === true || c.AutoApprove === 'TRUE';
       const div = document.createElement('div');
       div.className = 'row-card';
       div.innerHTML = `
         <div class="row-info">
-          <div class="row-title">${escapeHtml(c.ChannelName)}</div>
+          <div class="row-title">${isTrusted ? '<span class="trusted-badge">מהימן ✓</span>' : ''}${escapeHtml(c.ChannelName)}</div>
           <div class="row-sub">${escapeHtml(c.Category)} · ${escapeHtml(c.ChannelID)}</div>
           <div class="row-actions">
+            ${isTrusted ? '' : `<button class="btn-sm btn-trust" onclick="trustChannel('${c.ChannelID}')">אשר את כל תוכן הערוץ</button>`}
             <button class="btn-sm btn-remove" onclick="removeChannel('${c.ChannelID}')">הסר ערוץ</button>
           </div>
         </div>
@@ -362,15 +574,24 @@
     });
   }
 
+  async function trustChannel(id){
+    await postAction({ action:'trustChannel', channelId:id });
+    showToast('הערוץ מאושר - כל התוכן שלו יעלה אוטומטית מעכשיו');
+    loadChannels();
+    reloadPending();
+  }
+
   async function addChannel(){
     const id = document.getElementById('newChannelId').value.trim();
     const name = document.getElementById('newChannelName').value.trim();
     const category = document.getElementById('newChannelCategory').value;
+    const autoApprove = document.getElementById('newChannelAutoApprove').checked;
     if(!id || !name){ showToast('נא למלא את כל השדות'); return; }
-    await postAction({ action:'addChannel', channelId:id, channelName:name, category:category });
+    await postAction({ action:'addChannel', channelId:id, channelName:name, category:category, autoApprove:autoApprove });
     showToast('הערוץ נוסף');
     document.getElementById('newChannelId').value = '';
     document.getElementById('newChannelName').value = '';
+    document.getElementById('newChannelAutoApprove').checked = false;
     loadChannels();
   }
 

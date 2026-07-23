@@ -71,6 +71,152 @@
     margin-top: 4px;
   }
 
+  /* ---------- Top-level category tabs ---------- */
+  .top-cats{
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+    padding: 18px 16px 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .top-cats::-webkit-scrollbar{ display:none; }
+  .top-cat-btn{
+    flex-shrink:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    padding: 4px 2px;
+  }
+  .top-cat-circle{
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 1.4px solid rgba(198,161,82,0.4);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Playfair Display', serif;
+    font-size: 19px;
+    color: var(--gold-light);
+    transition: all .2s;
+  }
+  .top-cat-btn.active .top-cat-circle{
+    background: var(--gold);
+    color: var(--black);
+    border-color: var(--gold);
+  }
+  .top-cat-label{
+    font-size: 11px;
+    color: var(--text-dim);
+    white-space:nowrap;
+  }
+  .top-cat-btn.active .top-cat-label{ color: var(--gold-light); font-weight:600; }
+
+  .current-filter-label{
+    padding: 6px 16px 4px;
+    font-size: 12.5px;
+    color: var(--text-dim);
+  }
+  .current-filter-label b{ color: var(--gold-light); }
+
+  /* ---------- Subcategory panel (bottom sheet) ---------- */
+  .subcat-modal{
+    position:fixed; inset:0;
+    background: rgba(0,0,0,0.85);
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    z-index: 900;
+  }
+  .subcat-modal.open{ display:flex; }
+  .subcat-sheet{
+    width:100%;
+    max-width: 460px;
+    max-height: 70vh;
+    overflow-y:auto;
+    background: var(--black-soft);
+    border-top: 1px solid rgba(198,161,82,0.4);
+    border-radius: 18px 18px 0 0;
+    padding: 20px 18px 26px;
+  }
+  .subcat-sheet h3{
+    font-family:'Playfair Display', serif;
+    color: var(--gold-light);
+    font-size: 18px;
+    margin-bottom: 16px;
+    text-align:center;
+  }
+  .subcat-item{
+    width:100%;
+    text-align:right;
+    background: var(--card);
+    border: 1px solid rgba(198,161,82,0.2);
+    color: var(--text);
+    padding: 13px 16px;
+    border-radius: 10px;
+    font-family:'Assistant', sans-serif;
+    font-size: 14px;
+    font-weight:600;
+    margin-bottom: 9px;
+    cursor:pointer;
+  }
+  .subcat-item.all-item{
+    color: var(--gold-light);
+    border-color: var(--gold);
+  }
+  .subcat-close{
+    display:block;
+    margin: 12px auto 0;
+    background:transparent;
+    border:none;
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+
+  /* ---------- Search bar ---------- */
+  .search-wrap{
+    padding: 0 16px 4px;
+  }
+  .search-box{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background: var(--card);
+    border: 1px solid rgba(198,161,82,0.3);
+    border-radius: 22px;
+    padding: 9px 16px;
+  }
+  .search-box svg{ flex-shrink:0; width:16px; height:16px; }
+  .search-box input{
+    flex:1;
+    background:transparent;
+    border:none;
+    outline:none;
+    color: var(--text);
+    font-family:'Assistant', sans-serif;
+    font-size: 14px;
+  }
+  .search-box input::placeholder{ color: var(--text-dim); }
+  .search-clear{
+    background:transparent;
+    border:none;
+    color: var(--text-dim);
+    font-size: 16px;
+    cursor:pointer;
+    display:none;
+    padding: 0 2px;
+  }
+  .search-results-label{
+    padding: 14px 16px 6px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .search-results-label b{ color: var(--gold-light); }
+
   /* ---------- Category pills ---------- */
   .categories{
     display:flex;
@@ -102,13 +248,13 @@
   /* ---------- Video grid ---------- */
   .grid{
     display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    padding: 4px 16px 20px;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 4px 14px 20px;
   }
   .video-card{
     background: var(--card);
-    border-radius: 12px;
+    border-radius: 10px;
     overflow:hidden;
     border: 1px solid rgba(198,161,82,0.15);
     cursor:pointer;
@@ -127,12 +273,12 @@
     display:flex; align-items:center; justify-content:center;
     background: rgba(0,0,0,0.15);
   }
-  .play-badge svg{ width:34px; height:34px; }
-  .video-info{ padding: 10px 12px 12px; }
+  .play-badge svg{ width:24px; height:24px; }
+  .video-info{ padding: 7px 8px 9px; }
   .video-title{
-    font-size: 13.5px;
+    font-size: 11px;
     font-weight:600;
-    line-height:1.35;
+    line-height:1.3;
     color: var(--text);
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -140,9 +286,12 @@
     overflow:hidden;
   }
   .video-channel{
-    font-size: 11.5px;
+    font-size: 9.5px;
     color: var(--gold-light);
-    margin-top: 5px;
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .empty-state{
@@ -198,11 +347,150 @@
     font-size: 13.5px;
   }
 
-  .loading{
+  /* ---------- Request content button + modal ---------- */
+  .fab-request{
+    position:fixed;
+    bottom: 22px;
+    left: 18px;
+    background: var(--gold);
+    color: var(--black);
+    border:none;
+    border-radius: 24px;
+    padding: 12px 18px;
+    font-family:'Assistant', sans-serif;
+    font-weight:700;
+    font-size: 13px;
+    display:flex;
+    align-items:center;
+    gap:7px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+    z-index: 500;
+  }
+  .fab-request svg{ width:16px; height:16px; }
+
+  .request-modal{
+    position:fixed; inset:0;
+    background: rgba(0,0,0,0.85);
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    z-index: 998;
+  }
+  .request-modal.open{ display:flex; }
+  .request-sheet{
+    width:100%;
+    max-width: 460px;
+    background: var(--black-soft);
+    border-top: 1px solid rgba(198,161,82,0.4);
+    border-radius: 18px 18px 0 0;
+    padding: 22px 20px 26px;
+  }
+  .request-sheet h3{
+    font-family:'Playfair Display', serif;
+    color: var(--gold-light);
+    font-size: 17px;
+    margin-bottom: 14px;
     text-align:center;
-    padding: 30px;
+  }
+  .request-sheet input, .request-sheet select{
+    width:100%;
+    padding: 11px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(198,161,82,0.3);
+    background: var(--card);
+    color: var(--text);
+    font-family:'Assistant', sans-serif;
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  .request-sheet .req-btn-row{
+    display:flex;
+    gap:10px;
+    margin-top:6px;
+  }
+  .request-sheet button.submit-btn{
+    flex:1;
+    background: var(--gold);
+    color: var(--black);
+    border:none;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight:700;
+    font-size:14px;
+  }
+  .request-sheet button.cancel-btn{
+    flex:1;
+    background: transparent;
+    border: 1px solid rgba(198,161,82,0.4);
+    color: var(--text-dim);
+    padding: 12px;
+    border-radius: 10px;
+    font-weight:600;
+    font-size:14px;
+  }
+  .request-msg{
+    font-size: 12.5px;
+    text-align:center;
+    margin-bottom: 10px;
+    min-height: 16px;
+  }
+  .request-msg.error{ color: var(--gold-light); }
+  .request-msg.success{ color: #6FA37A; }
+
+  .loading{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    padding: 60px 20px;
     color: var(--text-dim);
     font-size: 13.5px;
+  }
+  .spinner{
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2.5px solid rgba(198,161,82,0.25);
+    border-top-color: var(--gold);
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin{
+    to{ transform: rotate(360deg); }
+  }
+
+  /* שלד טעינה (skeleton) לכרטיסי וידאו - מוצג בזמן שהתוכן עדיין נטען */
+  .skeleton-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 4px 14px 20px;
+  }
+  .skeleton-card{
+    background: var(--card);
+    border-radius: 12px;
+    overflow:hidden;
+    border: 1px solid rgba(198,161,82,0.15);
+  }
+  .skeleton-thumb{
+    width:100%;
+    aspect-ratio: 16/9;
+    background: linear-gradient(90deg, #1C1812 25%, #241f18 37%, #1C1812 63%);
+    background-size: 400% 100%;
+    animation: shimmer 1.4s ease infinite;
+  }
+  .skeleton-line{
+    height: 10px;
+    margin: 12px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #1C1812 25%, #241f18 37%, #1C1812 63%);
+    background-size: 400% 100%;
+    animation: shimmer 1.4s ease infinite;
+  }
+  .skeleton-line.short{ width: 50%; }
+  @keyframes shimmer{
+    0%{ background-position: 100% 50%; }
+    100%{ background-position: 0% 50%; }
   }
 </style>
 </head>
@@ -214,12 +502,48 @@
   <p>מוזיקה, ניגונים ותוכן מובחר</p>
 </header>
 
-<div class="categories" id="categories">
-  <button class="pill active" data-cat="all">הכל</button>
+<div class="search-wrap">
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#9C9184" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+    <input type="text" id="searchInput" placeholder="חיפוש שיר, ניגון או אמן...">
+    <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+  </div>
+</div>
+
+<div class="top-cats" id="topCats"></div>
+<div class="current-filter-label" id="currentFilterLabel"></div>
+
+<!-- Subcategory selection panel -->
+<div class="subcat-modal" id="subcatModal">
+  <div class="subcat-sheet">
+    <h3 id="subcatTitle"></h3>
+    <div id="subcatList"></div>
+    <button class="subcat-close" onclick="closeSubcatPanel()">סגירה</button>
+  </div>
 </div>
 
 <div id="content">
-  <div class="loading">טוען תוכן...</div>
+  <div class="loading"><div class="spinner"></div>טוען תוכן...</div>
+</div>
+
+<!-- Request Content Button -->
+<button class="fab-request" onclick="openRequestModal()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#0E0C0A" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+  בקשת תוכן
+</button>
+
+<!-- Request Content Modal -->
+<div class="request-modal" id="requestModal">
+  <div class="request-sheet">
+    <h3>בקשת אישור לתוכן חדש</h3>
+    <div class="request-msg" id="requestMsg"></div>
+    <input type="text" id="requestUrlInput" placeholder="הדביקי כאן קישור לסרטון YouTube">
+    <select id="requestCategorySelect"></select>
+    <div class="req-btn-row">
+      <button class="cancel-btn" onclick="closeRequestModal()">ביטול</button>
+      <button class="submit-btn" onclick="submitRequest()">שליחת בקשה</button>
+    </div>
+  </div>
 </div>
 
 <!-- Player Modal -->
@@ -235,61 +559,172 @@
   // ========================================================
   // הגדרה - יש להחליף בכתובת ה-Apps Script שלך אחרי הפריסה
   // ========================================================
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyT7FlY6OokaSYWskcNcz1fNJ6Ceq5cHhA8mNP87xgxw3aM1XA7n8BHcicFpgy01SWh/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJlaTRABHGgATAdX9pgt1pfwp4_0LveqihDGfUKo5TlXTnsSpXujZH6J3eha-lk6GmtA/exec';
 
-  const categoriesEl = document.getElementById('categories');
+  const topCatsEl = document.getElementById('topCats');
+  const filterLabelEl = document.getElementById('currentFilterLabel');
   const contentEl = document.getElementById('content');
   let currentCategory = 'all';
+  let categoryTree = [];
+
+  // מטמון בזיכרון - שומר תוצאות של קטגוריות שכבר נטענו, כדי שמעבר חוזר יהיה מיידי
+  const videoCache = {};
+  // כמה זמן (במילישניות) לפני שמטמון נחשב "ישן" ומתעדכן שוב ברקע - 5 דקות
+  const CACHE_TTL = 5 * 60 * 1000;
 
   async function loadCategories(){
     try{
-      const res = await fetch(`${APPS_SCRIPT_URL}?action=categories`);
-      const cats = await res.json();
-      cats.forEach(cat => {
-        const btn = document.createElement('button');
-        btn.className = 'pill';
-        btn.textContent = cat;
-        btn.dataset.cat = cat;
-        btn.onclick = () => selectCategory(cat, btn);
-        categoriesEl.appendChild(btn);
-      });
+      const res = await fetch(`${APPS_SCRIPT_URL}?action=categoryTree`);
+      categoryTree = await res.json();
+      renderTopCategories();
     }catch(err){
       console.warn('שגיאה בטעינת קטגוריות', err);
     }
   }
 
-  function selectCategory(cat, btnEl){
-    currentCategory = cat;
-    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-    btnEl.classList.add('active');
-    loadVideos(cat);
+  function renderTopCategories(){
+    topCatsEl.innerHTML = '';
+
+    const allBtn = document.createElement('button');
+    allBtn.className = 'top-cat-btn active';
+    allBtn.innerHTML = `<div class="top-cat-circle">הכל</div><div class="top-cat-label">הכל</div>`;
+    allBtn.onclick = () => selectAllContent(allBtn);
+    topCatsEl.appendChild(allBtn);
+
+    categoryTree.forEach(parent => {
+      const btn = document.createElement('button');
+      btn.className = 'top-cat-btn';
+      const initial = parent.name ? parent.name.charAt(0) : '?';
+      btn.innerHTML = `<div class="top-cat-circle">${escapeHtml(initial)}</div><div class="top-cat-label">${escapeHtml(parent.name)}</div>`;
+      btn.onclick = () => onTopCategoryClick(parent, btn);
+      topCatsEl.appendChild(btn);
+    });
   }
 
-  document.querySelector('.pill[data-cat="all"]').onclick = function(){
-    selectCategory('all', this);
-  };
+  function setActiveTopBtn(activeBtn){
+    document.querySelectorAll('.top-cat-btn').forEach(b => b.classList.remove('active'));
+    activeBtn.classList.add('active');
+  }
+
+  function selectAllContent(btnEl){
+    setActiveTopBtn(btnEl);
+    currentCategory = 'all';
+    filterLabelEl.innerHTML = '';
+    loadVideos('all');
+  }
+
+  function onTopCategoryClick(parent, btnEl){
+    setActiveTopBtn(btnEl);
+    if (!parent.subcategories || parent.subcategories.length === 0){
+      currentCategory = parent.name;
+      filterLabelEl.innerHTML = `מציגה: <b>${escapeHtml(parent.name)}</b>`;
+      loadVideos(parent.name);
+      return;
+    }
+    openSubcatPanel(parent);
+  }
+
+  function openSubcatPanel(parent){
+    document.getElementById('subcatTitle').textContent = parent.name;
+    const listEl = document.getElementById('subcatList');
+    listEl.innerHTML = '';
+
+    const allItem = document.createElement('button');
+    allItem.className = 'subcat-item all-item';
+    allItem.textContent = `כל ${parent.name}`;
+    allItem.onclick = () => selectSubcategory(parent.name, parent.name);
+    listEl.appendChild(allItem);
+
+    parent.subcategories.forEach(sub => {
+      const item = document.createElement('button');
+      item.className = 'subcat-item';
+      item.textContent = sub;
+      item.onclick = () => selectSubcategory(parent.name, sub);
+      listEl.appendChild(item);
+    });
+
+    document.getElementById('subcatModal').classList.add('open');
+  }
+
+  function closeSubcatPanel(){
+    document.getElementById('subcatModal').classList.remove('open');
+  }
+
+  function selectSubcategory(parentName, subName){
+    currentCategory = subName;
+    filterLabelEl.innerHTML = (subName === parentName)
+      ? `מציגה: <b>${escapeHtml(parentName)}</b>`
+      : `מציגה: <b>${escapeHtml(parentName)}</b> · ${escapeHtml(subName)}`;
+    loadVideos(subName);
+    closeSubcatPanel();
+  }
 
   async function loadVideos(category){
-    contentEl.innerHTML = '<div class="loading">טוען תוכן...</div>';
+    const cached = videoCache[category];
+    const now = Date.now();
+
+    // אם יש מטמון לקטגוריה הזו - מציגים אותו מיד, בלי המתנה לשרת
+    if (cached) {
+      renderVideos(cached.videos);
+      // אם המטמון ישן - מרעננים ברקע בלי לחסום את התצוגה
+      if (now - cached.timestamp > CACHE_TTL) {
+        fetchAndCache(category, true);
+      }
+      return;
+    }
+
+    // אין מטמון בכלל - זו הפעם הראשונה שמבקרים בקטגוריה הזו, מציגים שלד טעינה
+    showSkeleton();
+    await fetchAndCache(category, false);
+  }
+
+  function showSkeleton(){
+    const grid = document.createElement('div');
+    grid.className = 'skeleton-grid';
+    for(let i = 0; i < 6; i++){
+      const card = document.createElement('div');
+      card.className = 'skeleton-card';
+      card.innerHTML = `
+        <div class="skeleton-thumb"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
+      `;
+      grid.appendChild(card);
+    }
+    contentEl.innerHTML = '';
+    contentEl.appendChild(grid);
+  }
+
+  async function fetchAndCache(category, isBackgroundRefresh){
     try{
       const url = `${APPS_SCRIPT_URL}?action=videos&category=${encodeURIComponent(category)}`;
       const res = await fetch(url);
       const videos = await res.json();
 
-      if(!videos.length){
-        contentEl.innerHTML = '<div class="empty-state">אין עדיין תוכן בקטגוריה הזו</div>';
-        return;
-      }
+      videoCache[category] = { videos, timestamp: Date.now() };
 
-      const grid = document.createElement('div');
-      grid.className = 'grid';
-      videos.forEach(v => grid.appendChild(buildCard(v)));
-      contentEl.innerHTML = '';
-      contentEl.appendChild(grid);
+      // בעדכון רקע: מציגים את התוצאה החדשה רק אם המשתמש עדיין נמצא באותה קטגוריה
+      if (!isBackgroundRefresh || currentCategory === category) {
+        renderVideos(videos);
+      }
     }catch(err){
-      contentEl.innerHTML = '<div class="empty-state">שגיאה בטעינת התוכן. נסי לרענן.</div>';
+      if (!isBackgroundRefresh) {
+        contentEl.innerHTML = '<div class="empty-state">שגיאה בטעינת התוכן. נסי לרענן.</div>';
+      }
       console.warn(err);
     }
+  }
+
+  function renderVideos(videos){
+    if(!videos.length){
+      contentEl.innerHTML = '<div class="empty-state">אין עדיין תוכן בקטגוריה הזו</div>';
+      return;
+    }
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+    videos.forEach(v => grid.appendChild(buildCard(v)));
+    contentEl.innerHTML = '';
+    contentEl.appendChild(grid);
   }
 
   function buildCard(v){
@@ -331,6 +766,125 @@
 
   loadCategories();
   loadVideos('all');
+
+  // ========================================================
+  // בקשת תוכן - כל משתמש יכול להזין קישור לסרטון, זה נכנס
+  // ל"ממתינים" בפאנל הניהול לאישור מהיר, בלי צורך בסיסמה מהצד הציבורי
+  // ========================================================
+  function openRequestModal(){
+    document.getElementById('requestModal').classList.add('open');
+    document.getElementById('requestMsg').textContent = '';
+    document.getElementById('requestMsg').className = 'request-msg';
+  }
+
+  function closeRequestModal(){
+    document.getElementById('requestModal').classList.remove('open');
+    document.getElementById('requestUrlInput').value = '';
+  }
+
+  async function loadRequestCategories(){
+    try{
+      const res = await fetch(`${APPS_SCRIPT_URL}?action=categories`);
+      const cats = await res.json();
+      const sel = document.getElementById('requestCategorySelect');
+      sel.innerHTML = cats.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+    }catch(err){ console.warn(err); }
+  }
+  loadRequestCategories();
+
+  async function submitRequest(){
+    const url = document.getElementById('requestUrlInput').value.trim();
+    const category = document.getElementById('requestCategorySelect').value;
+    const msgEl = document.getElementById('requestMsg');
+
+    if (!url){
+      msgEl.textContent = 'נא להדביק קישור לסרטון';
+      msgEl.className = 'request-msg error';
+      return;
+    }
+
+    msgEl.textContent = 'שולח בקשה...';
+    msgEl.className = 'request-msg';
+
+    try{
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action:'requestVideo', videoUrl:url, category:category })
+      });
+      const data = await res.json();
+
+      if (data.success){
+        msgEl.textContent = 'הבקשה נשלחה! התוכן יעלה לאחר אישור';
+        msgEl.className = 'request-msg success';
+        setTimeout(closeRequestModal, 1800);
+      } else {
+        msgEl.textContent = data.error || 'משהו השתבש, נסי שוב';
+        msgEl.className = 'request-msg error';
+      }
+    }catch(err){
+      msgEl.textContent = 'שגיאת חיבור, נסי שוב';
+      msgEl.className = 'request-msg error';
+    }
+  }
+
+  // ========================================================
+  // חיפוש - מחפש בכל התוכן המאושר (לא מוגבל לקטגוריה נוכחית),
+  // כולל כל ההיסטוריה של הערוץ, לא רק מה שנטען לאחרונה
+  // ========================================================
+  const searchInput = document.getElementById('searchInput');
+  const searchClear = document.getElementById('searchClear');
+  let searchTimeout = null;
+  let isSearchActive = false;
+
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim();
+    searchClear.style.display = q ? 'block' : 'none';
+
+    clearTimeout(searchTimeout);
+    if (!q) {
+      exitSearch();
+      return;
+    }
+    // דיליי קצר כדי לא לשלוח בקשה על כל תו שמוקלד
+    searchTimeout = setTimeout(() => runSearch(q), 400);
+  });
+
+  function clearSearch(){
+    searchInput.value = '';
+    searchClear.style.display = 'none';
+    exitSearch();
+  }
+
+  function exitSearch(){
+    if (!isSearchActive) return;
+    isSearchActive = false;
+    topCatsEl.style.display = 'flex';
+    loadVideos(currentCategory);
+  }
+
+  async function runSearch(query){
+    isSearchActive = true;
+    topCatsEl.style.display = 'none';
+    filterLabelEl.innerHTML = '';
+    showSkeleton();
+    try{
+      const url = `${APPS_SCRIPT_URL}?action=search&q=${encodeURIComponent(query)}`;
+      const res = await fetch(url);
+      const videos = await res.json();
+
+      const label = document.createElement('div');
+      label.className = 'search-results-label';
+      label.innerHTML = videos.length
+        ? `נמצאו <b>${videos.length}</b> תוצאות עבור "${escapeHtml(query)}"`
+        : `אין תוצאות עבור "${escapeHtml(query)}"`;
+
+      renderVideos(videos);
+      contentEl.insertBefore(label, contentEl.firstChild);
+    }catch(err){
+      contentEl.innerHTML = '<div class="empty-state">שגיאה בחיפוש. נסי שוב.</div>';
+      console.warn(err);
+    }
+  }
 
   // ========================================================
   // רישום ה-Service Worker
